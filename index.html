@@ -1,0 +1,2890 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Protocole Tendon — Rééducation patellaire</title>
+<meta name="description" content="Suivi quotidien du protocole de charge pour tendinopathie patellaire proximale : séances, compléments, KPI, assiduité.">
+<meta name="theme-color" content="#141B22">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tendon">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="manifest" href="./manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Le moteur 3D est chargé après l'affichage de l'écran de chargement, pas avant :
+     un script bloquant dans l'en-tête laisse l'écran vide pendant tout le téléchargement. -->
+<style>
+/* ============ TOKENS — base = sombre (usage 5h-6h du matin) ============ */
+:root{
+  --bg:#141B22; --bg2:#101720; --surf:#1B242D; --surf2:#212C36;
+  --line:#2C3842; --line2:#3A4854;
+  --txt:#E6EDF2; --txt2:#95A3AF; --txt3:#6B7884;
+  --gold:#E0A82E; --gold-d:#8A6414; --gold-f:#2A2213;
+  --ok:#4FB286; --warn:#E8B04B; --bad:#CC5248;
+  --ok-f:#15261F; --warn-f:#2A2316; --bad-f:#2A1917;
+  --shadow:0 2px 0 rgba(0,0,0,.35);
+  --r:5px;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EDF0F2; --bg2:#E3E8EB; --surf:#FFFFFF; --surf2:#F6F8F9;
+    --line:#D3DADE; --line2:#BCC6CC;
+    --txt:#192229; --txt2:#5A6871; --txt3:#8795A0;
+    --gold:#9A6E08; --gold-d:#D9AE4E; --gold-f:#FBF2DD;
+    --ok:#2C7D5A; --warn:#9A6E08; --bad:#A93B32;
+    --ok-f:#E6F2EC; --warn-f:#FBF2DD; --bad-f:#FBE9E7;
+    --shadow:0 1px 0 rgba(0,0,0,.08);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EDF0F2; --bg2:#E3E8EB; --surf:#FFFFFF; --surf2:#F6F8F9;
+  --line:#D3DADE; --line2:#BCC6CC;
+  --txt:#192229; --txt2:#5A6871; --txt3:#8795A0;
+  --gold:#9A6E08; --gold-d:#D9AE4E; --gold-f:#FBF2DD;
+  --ok:#2C7D5A; --warn:#9A6E08; --bad:#A93B32;
+  --ok-f:#E6F2EC; --warn-f:#FBF2DD; --bad-f:#FBE9E7;
+  --shadow:0 1px 0 rgba(0,0,0,.08);
+}
+:root[data-theme="dark"]{
+  --bg:#141B22; --bg2:#101720; --surf:#1B242D; --surf2:#212C36;
+  --line:#2C3842; --line2:#3A4854;
+  --txt:#E6EDF2; --txt2:#95A3AF; --txt3:#6B7884;
+  --gold:#E0A82E; --gold-d:#8A6414; --gold-f:#2A2213;
+  --ok:#4FB286; --warn:#E8B04B; --bad:#CC5248;
+  --ok-f:#15261F; --warn-f:#2A2316; --bad-f:#2A1917;
+}
+
+#boot{
+  position:fixed;inset:0;z-index:90;background:#141B22;color:#E6EDF2;
+  display:grid;place-items:center;transition:opacity .3s;
+}
+#boot.off{opacity:0;pointer-events:none}
+#boot .bwrap{text-align:center;padding:24px;max-width:300px}
+#boot .bicon{
+  width:62px;height:62px;margin:0 auto 14px;border-radius:14px;background:#1B242D;
+  border:2px solid #E0A82E;position:relative;
+}
+#boot .bicon::before{
+  content:"";position:absolute;left:50%;top:12px;width:10px;height:38px;margin-left:-5px;
+  border-radius:5px;background:#E0A82E;
+}
+#boot .bicon::after{
+  content:"";position:absolute;left:50%;top:22px;width:20px;height:20px;margin-left:-10px;
+  border-radius:50%;background:#1B242D;border:3px solid #FFD678;
+}
+#boot .btitle{
+  font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:23px;font-weight:700;
+  letter-spacing:.3px;margin-bottom:16px;
+}
+#boot .bbar{height:4px;background:#2C3842;border-radius:2px;overflow:hidden;margin-bottom:11px}
+#boot .bbar div{height:100%;width:8%;background:#E0A82E;border-radius:2px;transition:width .35s}
+#boot .bmsg{font-size:13px;color:#95A3AF;min-height:19px}
+#boot .bmsg.ok{color:#4FB286;font-weight:600}
+
+#instSheet{position:fixed;inset:0;z-index:70;background:rgba(8,12,16,.74);display:grid;place-items:end center}
+#instSheet[hidden]{display:none}
+#instSheet .ish{
+  background:var(--surf);border-top:3px solid var(--gold);width:100%;max-width:520px;
+  padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 18px);
+  border-radius:12px 12px 0 0;
+}
+#instSheet .ish b{font-family:"Barlow Condensed",sans-serif;font-size:19px;display:block;margin-bottom:7px}
+#instSheet .ish p{font-size:13.5px;color:var(--txt2);margin:0 0 11px;line-height:1.5}
+#instSheet .ish ol{margin:0 0 13px;padding-left:22px;font-size:13.5px;line-height:1.7}
+#instSheet .ish ol b{display:inline;font-family:inherit;font-size:inherit}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg); color:var(--txt);
+  font-family:"IBM Plex Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  font-size:15px; line-height:1.5;
+  display:flex; flex-direction:column; overflow:hidden;
+  font-variant-numeric:tabular-nums;
+}
+h1,h2,h3,.cond,.tab b,.big{font-family:"Barlow Condensed","Arial Narrow",system-ui,sans-serif}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+img{max-width:100%}
+
+/* ============ SHELL ============ */
+header{
+  flex:0 0 auto; background:var(--bg2);
+  border-bottom:1px solid var(--line);
+  padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;
+  display:flex; align-items:baseline; gap:10px;
+}
+header h1{
+  margin:0; font-size:23px; font-weight:700; letter-spacing:.2px; line-height:1;
+}
+header h1 span{color:var(--gold)}
+header .meta{margin-left:auto;font-size:12px;color:var(--txt3);display:flex;gap:8px;align-items:center}
+header button.icon{
+  background:none;border:1px solid var(--line2);border-radius:var(--r);
+  color:var(--txt2);padding:3px 7px;cursor:pointer;font-size:13px;line-height:1.2
+}
+main{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.screen{display:none;padding:0 0 28px}
+.screen.on{display:block}
+
+nav{
+  flex:0 0 auto; display:grid; grid-template-columns:repeat(5,1fr);
+  background:var(--bg2); border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+nav .tab{
+  background:none;border:0;padding:8px 2px 9px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  color:var(--txt3);border-top:2px solid transparent;margin-top:-1px;
+}
+nav .tab b{font-size:13px;font-weight:500;letter-spacing:.3px}
+nav .tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+nav .tab.on{color:var(--gold);border-top-color:var(--gold)}
+
+/* ============ BLOCS GÉNÉRIQUES ============ */
+.sec{padding:16px 14px 0}
+.sec h2{
+  margin:0 0 2px; font-size:19px; font-weight:600; letter-spacing:.2px;
+}
+.sec p.lede{margin:0 0 12px;color:var(--txt2);font-size:13.5px;max-width:62ch}
+.hr{height:1px;background:var(--line);margin:18px 0 0}
+
+.verdict{
+  margin:14px 14px 0; border-left:4px solid var(--line2);
+  background:var(--surf); padding:13px 14px; border-radius:0 var(--r) var(--r) 0;
+}
+.verdict .lbl{font-size:11.5px;color:var(--txt3);letter-spacing:.5px}
+.verdict .big{font-size:27px;font-weight:700;line-height:1.05;margin:3px 0 4px;letter-spacing:.2px}
+.verdict .exp{font-size:13px;color:var(--txt2)}
+.verdict.ok{border-left-color:var(--ok);background:var(--ok-f)}
+.verdict.ok .big{color:var(--ok)}
+.verdict.warn{border-left-color:var(--warn);background:var(--warn-f)}
+.verdict.warn .big{color:var(--warn)}
+.verdict.bad{border-left-color:var(--bad);background:var(--bad-f)}
+.verdict.bad .big{color:var(--bad)}
+
+.row{
+  display:flex;align-items:flex-start;gap:11px;
+  padding:11px 14px;border-bottom:1px solid var(--line);
+  background:var(--surf);position:relative;
+}
+.row:first-of-type{border-top:1px solid var(--line)}
+.row .bar{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--line2)}
+.row[data-k="iso"] .bar{background:var(--gold)}
+.row[data-k="force"] .bar{background:#5B8FD9}
+.row[data-k="soutien"] .bar{background:#8C7AC7}
+.row[data-k="terrain"] .bar{background:var(--ok)}
+.row[data-k="cardio"] .bar{background:#4FA9B2}
+.row[data-k="plyo"] .bar{background:var(--bad)}
+.row.done{background:var(--surf2)}
+.row.done .name{color:var(--txt3);text-decoration:line-through}
+.row .chk{
+  flex:0 0 auto;width:26px;height:26px;border:1.5px solid var(--line2);
+  border-radius:var(--r);background:none;cursor:pointer;display:grid;place-items:center;
+  margin-top:1px;
+}
+.row .chk svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity .12s}
+.row.done .chk{border-color:var(--gold);background:var(--gold-f)}
+.row.done .chk svg{opacity:1}
+.row .body{flex:1 1 auto;min-width:0}
+.row .name{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:600;line-height:1.15}
+.row .sub{font-size:12.5px;color:var(--txt2);margin-top:2px}
+.row .when{font-size:11.5px;color:var(--gold);margin-top:3px;letter-spacing:.3px}
+.row .go{
+  flex:0 0 auto;background:none;border:1px solid var(--line2);border-radius:var(--r);
+  color:var(--txt2);padding:4px 8px;font-size:12px;cursor:pointer;margin-top:2px;
+}
+.row .go:active{background:var(--surf2)}
+
+.pillrow{display:flex;gap:6px;flex-wrap:wrap;padding:12px 14px 0}
+.pill{
+  background:var(--surf);border:1px solid var(--line);border-radius:999px;
+  padding:5px 11px;font-size:12.5px;color:var(--txt2);cursor:pointer;
+}
+.pill.on{background:var(--gold-f);border-color:var(--gold);color:var(--gold)}
+
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:14px}
+.stat>div{background:var(--surf);padding:11px 12px}
+.stat .v{font-family:"Barlow Condensed",sans-serif;font-size:26px;font-weight:700;line-height:1}
+.stat .k{font-size:11.5px;color:var(--txt3);margin-top:2px}
+
+table.grid{width:100%;border-collapse:collapse;font-size:12.5px}
+table.grid th,table.grid td{border:1px solid var(--line);padding:6px 7px;text-align:left;vertical-align:top}
+table.grid th{background:var(--surf2);font-weight:600;color:var(--txt2);font-size:11.5px}
+table.grid td b{font-weight:600}
+
+.note{
+  margin:12px 14px 0;padding:11px 13px;background:var(--surf);
+  border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 var(--r) var(--r) 0;
+  font-size:13px;color:var(--txt2);
+}
+.note strong{color:var(--txt)}
+.note.bad{border-left-color:var(--bad)}
+.note.ok{border-left-color:var(--ok)}
+
+.btn{
+  background:var(--gold);color:#17120A;border:0;border-radius:var(--r);
+  padding:10px 15px;font-weight:600;font-size:14px;cursor:pointer;
+}
+.btn.ghost{background:none;border:1px solid var(--line2);color:var(--txt2);font-weight:500}
+.btn:active{transform:translateY(1px)}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;padding:14px}
+
+/* ============ KPI SAISIE ============ */
+.field{padding:14px;border-bottom:1px solid var(--line);background:var(--surf)}
+.field .q{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:600}
+.field .h{font-size:12.5px;color:var(--txt2);margin:2px 0 10px;max-width:60ch}
+.scale{display:grid;grid-template-columns:repeat(11,1fr);gap:3px}
+.scale button{
+  border:1px solid var(--line2);background:var(--bg2);color:var(--txt2);
+  border-radius:var(--r);padding:8px 0;cursor:pointer;font-size:13px;
+  font-family:"Barlow Condensed",sans-serif;font-weight:600;
+}
+.scale button.on{color:#17120A;border-color:transparent}
+.scale button.on[data-z="ok"]{background:var(--ok)}
+.scale button.on[data-z="warn"]{background:var(--warn)}
+.scale button.on[data-z="bad"]{background:var(--bad);color:#fff}
+.scalelg{display:flex;justify-content:space-between;font-size:11px;color:var(--txt3);margin-top:5px}
+.numin{display:flex;align-items:center;gap:8px}
+.numin input{
+  width:84px;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);
+  padding:8px 10px;font-size:16px;font-family:"Barlow Condensed",sans-serif;font-weight:600;
+}
+.numin span{font-size:13px;color:var(--txt2)}
+
+.spark{display:flex;align-items:flex-end;gap:3px;height:52px;padding:14px 14px 0}
+.spark div{flex:1 1 0;background:var(--line2);border-radius:2px 2px 0 0;min-height:2px;position:relative}
+.sparklab{display:flex;gap:3px;padding:4px 14px 0}
+.sparklab span{flex:1 1 0;text-align:center;font-size:9.5px;color:var(--txt3)}
+
+/* ============ ASSIDUITÉ ============ */
+.week{display:grid;grid-template-columns:72px repeat(7,1fr);gap:2px;padding:0 14px}
+.week .hd{font-size:10.5px;color:var(--txt3);text-align:center;padding:4px 0;font-family:"Barlow Condensed",sans-serif;font-weight:600;letter-spacing:.4px}
+.week .rl{font-size:11px;color:var(--txt2);padding:7px 4px 7px 0;line-height:1.2}
+.week .cell{height:30px;border-radius:3px;background:var(--bg2);border:1px solid var(--line);display:grid;place-items:center;font-size:11px;color:var(--txt3)}
+.week .cell.d{background:var(--gold);border-color:var(--gold);color:#17120A;font-weight:600}
+.week .cell.m{background:var(--surf2);color:var(--txt3)}
+.week .cell.na{background:transparent;border-color:transparent}
+
+/* ============ 3D VIEWER ============ */
+#tmr{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;flex-direction:column}
+#tmr.on{display:flex}
+#tmr .thead{
+  flex:0 0 auto;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;
+  border-bottom:1px solid var(--line);background:var(--bg2);display:flex;align-items:center;gap:10px;
+}
+#tmr .thead .t{flex:1 1 auto;min-width:0}
+#tmr .thead .t b{font-family:"Barlow Condensed",sans-serif;font-size:19px;font-weight:600;display:block;line-height:1.1}
+#tmr .thead .t i{font-style:normal;font-size:12px;color:var(--txt3)}
+#tmr .tbody{flex:1 1 auto;overflow-y:auto;display:flex;flex-direction:column}
+#tmr .dial{position:relative;display:grid;place-items:center;padding:18px 14px 6px}
+#tmr svg{width:min(78vw,300px);height:min(78vw,300px);transform:rotate(-90deg)}
+#tmr svg circle{fill:none;stroke-linecap:round}
+#tmr .ring-bg{stroke:var(--line);stroke-width:9}
+#tmr .ring-fg{stroke:var(--gold);stroke-width:9;transition:stroke .3s}
+#tmr .mid{position:absolute;text-align:center;display:grid;gap:1px}
+#tmr .num{font-family:"Barlow Condensed",sans-serif;font-size:min(21vw,80px);font-weight:700;line-height:.95;letter-spacing:-1px}
+#tmr .ph{font-family:"Barlow Condensed",sans-serif;font-size:19px;font-weight:600;color:var(--gold);letter-spacing:.4px}
+#tmr .sr{font-size:12.5px;color:var(--txt2)}
+#tmr .tctrl{display:flex;gap:8px;padding:8px 14px 0;flex-wrap:wrap;justify-content:center}
+#tmr .tctrl button{
+  background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);
+  color:var(--txt2);padding:9px 13px;font-size:13.5px;cursor:pointer;
+}
+#tmr .tctrl button.main{background:var(--gold);border-color:var(--gold);color:#17120A;font-weight:600;min-width:132px}
+#tmr .tctrl button.on{background:var(--gold-f);border-color:var(--gold);color:var(--gold)}
+#tmr .cfg{display:grid;grid-template-columns:1fr auto auto auto;gap:7px 9px;align-items:center;padding:14px 14px 0}
+#tmr .cfg .lb{font-size:13px;color:var(--txt2)}
+#tmr .cfg .vv{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:600;min-width:52px;text-align:right}
+#tmr .cfg button{
+  width:32px;height:32px;background:var(--bg2);border:1px solid var(--line2);
+  border-radius:var(--r);color:var(--txt2);font-size:17px;cursor:pointer;line-height:1;
+}
+#tmr .seq{display:flex;gap:3px;padding:14px 14px 0;flex-wrap:wrap}
+#tmr .seq span{
+  flex:1 1 14px;height:6px;border-radius:3px;background:var(--line);min-width:10px;
+}
+#tmr .seq span.d{background:var(--gold)}
+#tmr .seq span.c{background:var(--txt3)}
+#visa{position:fixed;inset:0;background:var(--bg);z-index:55;display:none;flex-direction:column}
+#visa.on{display:flex}
+#visa .qhead{
+  flex:0 0 auto;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;
+  border-bottom:1px solid var(--line);background:var(--bg2);display:flex;align-items:center;gap:10px;
+}
+#visa .qhead .t{flex:1 1 auto;min-width:0}
+#visa .qhead .t b{font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:600;display:block;line-height:1.1}
+#visa .qhead .t i{font-style:normal;font-size:12px;color:var(--txt3)}
+#visa .qbody{flex:1 1 auto;overflow-y:auto}
+#visa .live{
+  position:sticky;bottom:0;background:var(--bg2);border-top:1px solid var(--line);
+  padding:10px 14px calc(env(safe-area-inset-bottom,0px) + 10px);
+  display:flex;align-items:center;gap:12px;
+}
+#visa .live .n{font-family:"Barlow Condensed",sans-serif;font-size:30px;font-weight:700;line-height:1}
+#visa .live .l{flex:1 1 auto;font-size:12px;color:var(--txt2);line-height:1.3}
+.opts{display:grid;gap:5px}
+.opts button{
+  text-align:left;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);
+  padding:9px 11px;font-size:13px;color:var(--txt2);cursor:pointer;line-height:1.3;
+}
+.opts button.on{background:var(--gold-f);border-color:var(--gold);color:var(--txt)}
+.opts button b{font-family:"Barlow Condensed",sans-serif;color:var(--gold);margin-right:7px;font-size:14px}
+#viewer{
+  position:fixed;inset:0;background:var(--bg);z-index:50;
+  display:none;flex-direction:column;
+}
+#viewer.on{display:flex}
+#viewer .vhead{
+  flex:0 0 auto;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;
+  border-bottom:1px solid var(--line);background:var(--bg2);
+  display:flex;align-items:center;gap:10px;
+}
+#viewer .vhead .t{flex:1 1 auto;min-width:0}
+#viewer .vhead .t b{font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:600;display:block;line-height:1.1}
+#viewer .vhead .t i{font-style:normal;font-size:12px;color:var(--txt3)}
+#viewer .vhead .hbtn{
+  flex:0 0 auto;background:var(--gold);border:0;border-radius:var(--r);
+  color:#17120A;font-weight:600;font-size:13px;padding:8px 11px;cursor:pointer;
+  font-family:"Barlow Condensed",sans-serif;letter-spacing:.3px;white-space:nowrap;
+}
+#viewer .vhead .hbtn.live{background:var(--ok);color:#06140E}
+header button#instBtn{
+  background:var(--gold);border-color:var(--gold);color:#17120A;font-weight:600;
+  font-family:"Barlow Condensed",sans-serif;font-size:13px;padding:5px 10px;letter-spacing:.3px;
+}
+#viewer .vbody{flex:1 1 auto;overflow-y:auto;min-height:0}
+.vtmr{
+  flex:0 0 auto;background:var(--bg2);border-top:1px solid var(--line);
+  padding:9px 12px calc(env(safe-area-inset-bottom,0px) + 9px);
+  display:flex;align-items:center;gap:10px;
+}
+.vtmr[hidden]{display:none}
+.vtmr .n{
+  font-family:"Barlow Condensed",sans-serif;font-size:34px;font-weight:700;
+  line-height:1;min-width:72px;text-align:center;
+}
+.vtmr .m{flex:1 1 auto;min-width:0}
+.vtmr .m b{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:600;color:var(--gold);display:block;line-height:1.1}
+.vtmr .m i{font-style:normal;font-size:11.5px;color:var(--txt2);display:block}
+.vtmr .pg{height:4px;background:var(--line);border-radius:2px;margin-top:5px;overflow:hidden}
+.vtmr .pg div{height:100%;background:var(--gold);width:0%;transition:width .2s linear}
+.vtmr .bt{display:flex;gap:5px;flex:0 0 auto}
+.vtmr .bt button{
+  background:var(--bg);border:1px solid var(--line2);border-radius:var(--r);
+  color:var(--txt2);padding:7px 9px;font-size:12.5px;cursor:pointer;line-height:1.2;
+}
+.vtmr .bt button.main{background:var(--gold);border-color:var(--gold);color:#17120A;font-weight:600;min-width:72px}
+#canwrap{position:relative;background:var(--bg2);border-bottom:1px solid var(--line);touch-action:none;cursor:grab}
+#canwrap:active{cursor:grabbing}
+#can{display:block;width:100%}
+#angle{
+  position:absolute;right:9px;top:9px;background:rgba(20,27,34,.82);
+  border:1px solid var(--line2);border-radius:var(--r);padding:5px 8px;
+  font-family:"Barlow Condensed",sans-serif;font-size:13px;color:var(--gold);
+  pointer-events:none;letter-spacing:.3px;
+}
+#phase{
+  position:absolute;left:9px;top:9px;background:rgba(14,20,26,.80);
+  border:1px solid var(--line2);border-left:3px solid var(--gold);border-radius:var(--r);
+  padding:6px 10px;pointer-events:none;max-width:62%;
+}
+#phase b{font-family:"Barlow Condensed",sans-serif;font-size:16px;font-weight:600;color:var(--txt);display:block;line-height:1.1}
+#phase i{font-style:normal;font-size:11.5px;color:var(--gold);letter-spacing:.3px}
+.vseek{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surf);border-bottom:1px solid var(--line)}
+.vseek button{
+  background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);
+  color:var(--txt2);padding:6px 10px;font-size:12.5px;cursor:pointer;flex:0 0 auto;
+}
+.vseek input[type=range]{flex:1 1 auto;min-width:0;accent-color:var(--gold);height:26px}
+.strip{
+  display:flex;gap:7px;overflow-x:auto;padding:11px 14px;background:var(--bg2);
+  border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch;
+}
+.strip:empty{display:none}
+.strip button{
+  flex:0 0 auto;width:92px;background:none;border:1px solid var(--line);
+  border-radius:var(--r);padding:0;cursor:pointer;overflow:hidden;
+}
+.strip button.on{border-color:var(--gold)}
+.strip img{display:block;width:100%;height:92px;object-fit:cover;background:var(--surf)}
+.strip span{
+  display:block;padding:4px 5px 5px;font-family:"Barlow Condensed",sans-serif;
+  font-size:12.5px;font-weight:600;color:var(--txt2);line-height:1.15;text-align:left;
+}
+.strip button.on span{color:var(--gold)}
+#hint{
+  position:absolute;left:9px;bottom:9px;font-size:11px;color:var(--txt3);
+  background:rgba(20,27,34,.72);padding:3px 7px;border-radius:var(--r);pointer-events:none;
+}
+.vctrl{display:flex;gap:6px;padding:10px 14px;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--surf)}
+.vctrl button{
+  background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);
+  color:var(--txt2);padding:6px 10px;font-size:12.5px;cursor:pointer;
+}
+.vctrl button.on{background:var(--gold-f);border-color:var(--gold);color:var(--gold)}
+.steps{counter-reset:s;padding:14px 14px 0;margin:0;list-style:none}
+.steps li{
+  counter-increment:s;position:relative;padding-left:30px;margin-bottom:11px;
+  font-size:13.5px;color:var(--txt);
+}
+.steps li::before{
+  content:counter(s);position:absolute;left:0;top:0;
+  width:21px;height:21px;border:1px solid var(--gold);border-radius:50%;
+  color:var(--gold);font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:600;
+  display:grid;place-items:center;
+}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;padding:12px 14px 0;font-size:13px}
+.kv dt{color:var(--txt3);font-size:12px}
+.kv dd{margin:0 0 4px;font-weight:500}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+@media (min-width:640px){
+  main{max-width:720px;margin:0 auto;width:100%}
+  #viewer .vbody{max-width:720px;margin:0 auto;width:100%}
+}
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <div class="bwrap">
+    <div class="bicon"></div>
+    <div class="btitle">Protocole Tendon</div>
+    <div class="bbar"><div id="bootBar"></div></div>
+    <div class="bmsg" id="bootMsg">Démarrage…</div>
+  </div>
+</div>
+
+<div id="instSheet" hidden>
+  <div class="ish">
+    <b>Ajouter à l'écran d'accueil</b>
+    <p>Chrome n'a pas proposé l'installation automatique sur cette adresse. La méthode manuelle donne le même résultat :</p>
+    <ol>
+      <li>Touche le menu <b>⋮</b> en haut à droite de Chrome</li>
+      <li>Choisis <b>« Ajouter à l'écran d'accueil »</b> ou <b>« Installer l'application »</b></li>
+      <li>Valide le nom, puis <b>Ajouter</b></li>
+    </ol>
+    <p id="instWhy"></p>
+    <button class="btn" id="instClose">J'ai compris</button>
+  </div>
+</div>
+
+<header>
+  <h1>Protocole <span>Tendon</span></h1>
+  <div class="meta">
+    <span id="hday">—</span>
+    <button class="icon" id="instBtn" title="Installer sur l'écran d'accueil">Installer</button>
+    <button class="icon" id="themeBtn" title="Thème clair / sombre">◐</button>
+  </div>
+</header>
+
+<main>
+  <!-- ========================= AUJOURD'HUI ========================= -->
+  <section class="screen on" id="s-today">
+    <div class="verdict" id="verdict">
+      <div class="lbl">Règle des 24 h</div>
+      <div class="big">En attente</div>
+      <div class="exp">Renseigne ta douleur du matin dans l'onglet KPI pour obtenir le verdict.</div>
+    </div>
+
+    <div class="sec">
+      <h2 id="todayTitle">Séance du jour</h2>
+      <p class="lede" id="todayLede"></p>
+    </div>
+    <div id="blocks"></div>
+
+    <div class="sec">
+      <h2>Compléments</h2>
+      <p class="lede">Coche à la prise. Le collagène doit précéder la charge de 60 min — c'est le seul dont le timing est non négociable.</p>
+    </div>
+    <div id="supps"></div>
+
+    <div class="stat" id="todayStat"></div>
+
+    <div class="note bad" id="phaseWarn" hidden></div>
+    <div class="note" id="fastNote" hidden></div>
+  </section>
+
+  <!-- ========================= EXERCICES ========================= -->
+  <section class="screen" id="s-ex">
+    <div class="sec">
+      <h2>Bibliothèque de mouvements</h2>
+      <p class="lede">Chaque mouvement s'anime en 3D. Fais glisser pour tourner autour de la figure et vérifier tes angles — surtout la verticalité du tibia.</p>
+    </div>
+    <div class="pillrow" id="exFilter"></div>
+    <div id="exList" style="margin-top:12px"></div>
+  </section>
+
+  <!-- ========================= KPI ========================= -->
+  <section class="screen" id="s-kpi">
+    <div class="sec">
+      <h2>Mesures du matin</h2>
+      <p class="lede">À 6 h 00, avant la séance, toujours dans le même ordre. Ces trois chiffres pilotent tout le protocole.</p>
+    </div>
+    <div id="kpiFields"></div>
+
+    <div class="sec">
+      <h2>Douleur au squat déclin — 14 derniers jours</h2>
+      <p class="lede">Objectif de la semaine 1 : passer sous 3. Objectif J21 : sous 2.</p>
+    </div>
+    <div class="spark" id="sparkPain"></div>
+    <div class="sparklab" id="sparkPainLab"></div>
+
+    <div class="sec" style="margin-top:6px">
+      <h2>Bilan hebdomadaire</h2>
+      <p class="lede">Le dimanche à 10 h. Le VISA-P est le questionnaire de référence sur cette pathologie — sans lui tu pilotes à l'aveugle.</p>
+    </div>
+    <div id="weeklyFields"></div>
+  </section>
+
+  <!-- ========================= SEMAINE ========================= -->
+  <section class="screen" id="s-week">
+    <div class="sec">
+      <h2>Assiduité</h2>
+      <p class="lede">Sept derniers jours. Or = fait, gris = prévu non fait, vide = non prévu ce jour-là.</p>
+    </div>
+    <div class="week" id="weekGrid"></div>
+    <div class="stat" id="weekStat"></div>
+    <div class="sec">
+      <h2>Lecture</h2>
+    </div>
+    <div class="note" id="weekRead"></div>
+    <div class="btnrow">
+      <button class="btn ghost" id="copyBtn">Copier mes données</button>
+      <button class="btn ghost" id="resetBtn">Effacer tout</button>
+    </div>
+  </section>
+
+  <!-- ========================= PROTOCOLE ========================= -->
+  <section class="screen" id="s-proto">
+    <div class="sec">
+      <h2>Phase en cours</h2>
+      <p class="lede">Touche une semaine pour la consulter : ça ne change rien à ton programme. Pour changer réellement de semaine, utilise le bouton d'activation en dessous.</p>
+    </div>
+    <div class="pillrow" id="phasePick"></div>
+    <div style="padding:12px 14px 0" id="phaseSwitch"></div>
+    <div class="note ok" id="gateNote"></div>
+
+    <div class="sec"><h2>Semaine type</h2></div>
+    <div style="padding:0 14px"><div id="protoWeek"></div></div>
+
+    <div class="sec"><h2>Cibles nutrition — 76 kg</h2></div>
+    <div style="padding:0 14px">
+      <table class="grid">
+        <tr><th>Repère</th><th>Cible</th></tr>
+        <tr><td>Protéines</td><td><b>145 g/jour</b> (1,9 g/kg) — 4 prises de 28-45 g</td></tr>
+        <tr><td>Calories</td><td>2600-2900 kcal — maintenance, jamais de déficit sur ces 3 semaines</td></tr>
+        <tr><td>Eau</td><td><b>3 L/jour</b> hors jeûne — le tendon est à 70 % d'eau</td></tr>
+        <tr><td>Collagène</td><td>15 g + 500 mg vit. C, <b>60 min avant</b> la charge</td></tr>
+        <tr><td>Oméga-3</td><td>2,5 g EPA+DHA cumulés, au repas du soir</td></tr>
+        <tr><td>Vitamine D3</td><td>4000 UI le matin, jusqu'au dosage de la 25-OH-D</td></tr>
+        <tr><td>Créatine</td><td>5 g/jour, constance &gt; timing</td></tr>
+        <tr><td>Magnésium</td><td>350 mg bisglycinate, 1 h avant le coucher</td></tr>
+      </table>
+    </div>
+
+    <div class="sec"><h2>Jeûne du lundi et du jeudi</h2></div>
+    <div class="note">
+      <strong>Isométrie maintenue</strong> — coût métabolique quasi nul, aucun problème à jeun.<br>
+      <strong>Charge lourde supprimée le matin</strong> → reportée à 20 h 30, environ 1 h 30 après la rupture.<br>
+      Reprise en trois temps : 400 ml d'eau + 3 dattes + 25 g d'isolate → à +45 min, repas complet avec oméga-3 et créatine → à +2 h 30, fractionner l'eau jusqu'au coucher.
+    </div>
+
+    <div class="sec"><h2>Chaud, froid, et ce qui ne sert à rien</h2></div>
+    <div class="note ok">
+      <strong>Chaud avant la séance</strong> — 10 min de bouillotte ou douche chaude attaquent directement la raideur du réveil. C'est ce qu'il te faut le matin.
+    </div>
+    <div class="note">
+      <strong>Froid</strong> — antalgique ponctuel seulement, 10-15 min, sur poussée réelle au-delà de 6/10. Jamais dans les 2 h après une séance de charge : tu couperais l'adaptation que la séance vient de déclencher. Et jamais en routine quotidienne, sinon tu masques ton KPI n°1.
+    </div>
+    <div class="note bad">
+      <strong>À refuser</strong> — injection de corticoïdes (soulage à 6 semaines, dégrade à 6 mois, risque de rupture) et anti-inflammatoires en continu (ils inhibent la synthèse de collagène, tu annules ton propre programme). Jamais de séance sous AINS : tu supprimes ton seul système d'alerte.
+    </div>
+
+    <div class="sec"><h2>Test de sortie — J21</h2></div>
+    <div style="padding:0 14px">
+      <table class="grid">
+        <tr><th>Test</th><th>Validation</th></tr>
+        <tr><td>VISA-P</td><td>≥ 80 / 100</td></tr>
+        <tr><td>30 sauts unipodaux consécutifs</td><td>Douleur ≤ 3, pas de dégradation à 24 h</td></tr>
+        <tr><td>Sprint 30 m à 95 %</td><td>Indolore</td></tr>
+        <tr><td>15 centres pied droit après course</td><td>Douleur ≤ 3, qualité intacte sur les 5 derniers</td></tr>
+        <tr><td>10 changements de direction à 90°</td><td>Indolore, aucun valgus à la vidéo</td></tr>
+      </table>
+    </div>
+    <div class="note">
+      <strong>5/5</strong> → entraînement club complet, puis 30-40 min de match en S4.<br>
+      <strong>4/5</strong> → sept jours de plus en S3, puis retest.<br>
+      <strong>3/5 ou moins</strong> → bilan kiné en présentiel. Le protocole seul ne suffit pas.
+    </div>
+    <div class="note bad">
+      <strong>Le délai honnête.</strong> Avec une douleur de départ à 5/10 et trois mois d'évolution, J21 te ramène à l'entraînement complet, pas au match complet. Match de 30-45 min vers J28-J35, match entier vers J45-J60. Forcer le match à J21 est le scénario qui coûte trois mois.
+    </div>
+  </section>
+</main>
+
+<nav id="nav"></nav>
+
+<!-- ========================= VIEWER 3D ========================= -->
+<div id="tmr">
+  <div class="thead">
+    <button class="icon" id="tmrClose" style="padding:5px 9px;font-size:16px">←</button>
+    <div class="t"><b id="tmrName">Minuteur</b><i id="tmrSub">—</i></div>
+    <button class="icon" id="tmrSound" title="Son">♪</button>
+  </div>
+  <div class="tbody">
+    <div class="dial">
+      <svg viewBox="0 0 120 120" aria-hidden="true">
+        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+        <circle class="ring-fg" cx="60" cy="60" r="52" id="tmrRing"
+                stroke-dasharray="326.7" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="mid">
+        <div class="num" id="tmrNum">45</div>
+        <div class="ph" id="tmrPh">Prêt</div>
+        <div class="sr" id="tmrSr">—</div>
+      </div>
+    </div>
+    <div class="seq" id="tmrSeq"></div>
+    <div class="tctrl">
+      <button class="main" id="tmrGo">Démarrer</button>
+      <button id="tmrSkip">Passer</button>
+      <button id="tmrPlus">+30 s</button>
+      <button id="tmrReset">Remettre à zéro</button>
+    </div>
+    <div class="cfg" id="tmrCfg"></div>
+    <div class="note" id="tmrNote" style="margin-top:16px"></div>
+    <div style="height:calc(env(safe-area-inset-bottom,0px) + 20px)"></div>
+  </div>
+</div>
+
+<div id="visa">
+  <div class="qhead">
+    <button class="icon" id="visaClose" style="padding:5px 9px;font-size:16px">←</button>
+    <div class="t"><b>VISA-P</b><i>8 questions · score sur 100 · 5 minutes</i></div>
+  </div>
+  <div class="qbody">
+    <div class="note">
+      <strong>À quoi ça sert.</strong> C'est le questionnaire de référence sur la tendinopathie rotulienne, utilisé dans toutes les études cliniques. Il mesure l'impact réel de ton tendon sur ta vie et ton sport, là où ta note de douleur du matin ne mesure qu'un instant. C'est lui qui dira si tu progresses vraiment.
+    </div>
+    <div class="note">
+      <strong>Comment le remplir.</strong> Le dimanche matin, toujours au même moment, avant toute séance. Réponds sur les 7 derniers jours, pas sur l'instant présent. Ne cherche pas à bien figurer : un score honnêtement bas est utile, un score flatté ne sert à rien.
+    </div>
+    <div id="visaQ"></div>
+    <div class="note" id="visaRead"></div>
+    <div class="btnrow">
+      <button class="btn" id="visaSave">Enregistrer ce score</button>
+      <button class="btn ghost" id="visaWipe">Repartir de zéro</button>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+  <div class="live">
+    <div class="n" id="visaNum">—</div>
+    <div class="l" id="visaLab">Réponds aux 8 questions pour obtenir ton score.</div>
+  </div>
+</div>
+
+<div id="viewer">
+  <div class="vhead">
+    <button class="icon" id="vClose" style="padding:5px 9px;font-size:16px">←</button>
+    <div class="t"><b id="vName">—</b><i id="vPhase">—</i></div>
+    <button class="hbtn" id="vTimer">⏱ Minuteur</button>
+  </div>
+  <div class="vbody">
+    <div id="canwrap">
+      <canvas id="can"></canvas>
+      <div id="angle">—</div>
+      <div id="hint">Glisse pour tourner · touche une position sous l'image</div>
+      <div id="phase"><b>—</b><i></i></div>
+    </div>
+    <div class="vctrl">
+      <button id="vPlay">⏸ Pause</button>
+      <button id="vSlow">Ralenti</button>
+      <button id="vGuide">Repères</button>
+      <button data-cam="side" class="on">Profil</button>
+      <button data-cam="front">Face</button>
+      <button data-cam="q">3/4</button>
+    </div>
+    <div class="vseek">
+      <button id="vStep" title="Position suivante">Pas à pas</button>
+      <input id="vSeek" type="range" min="0" max="1000" value="0" step="1" aria-label="Parcourir le mouvement">
+    </div>
+    <div class="strip" id="vStrip"></div>
+    <dl class="kv" id="vParams"></dl>
+    <div class="sec" style="padding-top:14px"><h2>Exécution</h2></div>
+    <ol class="steps" id="vSteps"></ol>
+    <div id="vWarn"></div>
+    <div style="height:calc(env(safe-area-inset-bottom,0px) + 24px)"></div>
+  </div>
+  <div class="vtmr" id="vTmrBar" hidden>
+    <div class="n" id="vtNum">—</div>
+    <div class="m">
+      <b id="vtPh">—</b>
+      <i id="vtSr">—</i>
+      <div class="pg"><div id="vtPg"></div></div>
+    </div>
+    <div class="bt">
+      <button class="main" id="vtGo">Pause</button>
+      <button id="vtSkip" title="Passer cette phase">⏭</button>
+      <button id="vtFull" title="Plein écran">⤢</button>
+      <button id="vtStop" title="Arrêter">✕</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   1. DONNÉES — exercices, poses 3D, programme, compléments
+   ============================================================ */
+const L = {thigh:.45, shin:.42, foot:.20, torso:.52, uarm:.30, farm:.26, head:.112, ankle:.075};
+
+/* Convention d'angles (degrés) :
+   hip  : négatif = flexion de hanche (le genou part vers l'avant)
+   knee : positif = flexion de genou (le tibia part vers l'arrière)
+   Tibia vertical  <=>  hip + knee = 0                                     */
+
+function legY(hip, knee){
+  const r = Math.PI/180;
+  return L.ankle + L.shin*Math.cos((hip+knee)*r) + L.thigh*Math.cos(hip*r);
+}
+
+const EX = {
+  spanish:{
+    n:"Spanish squat", ph:["S1","S2","S3"], k:"iso", star:true,
+    tag:"Isométrie — le traitement principal",
+    params:{"Dosage":"5 × 45 s — minuteur intégré","Repos":"2 min entre séries","Angle genou":"60° (45° si douleur > 4)",
+            "Moment":"6 h 00 tous les jours + 21 h 00","Douleur acceptable":"3-4/10 pendant l'effort",
+            "Attendu":"douleur immédiatement après ≤ douleur avant"},
+    steps:[
+      "Fixe une sangle ou un élastique épais à un point d'ancrage bas, derrière toi, et passe-la derrière tes deux genoux.",
+      "Pieds à plat, largeur de bassin. Laisse-toi tomber en arrière : c'est la sangle qui retient ton poids, pas tes quadriceps seuls.",
+      "Garde les tibias strictement verticaux. C'est le point technique qui fait tout l'exercice — un tibia incliné vers l'avant transfère la charge sur l'articulation au lieu du tendon.",
+      "Descends jusqu'à 60° de flexion de genou. Tes hanches finissent derrière tes genoux.",
+      "Contracte fort, environ 70 % de ton maximum, et tiens 45 secondes sans bouger. Respire normalement.",
+      "Repose 2 minutes complètes avant la série suivante."
+    ],
+    warn:"Si la douleur monte après la série au lieu de descendre, dis-le à ton coach : ce n'est pas la réponse attendue et ça change la lecture de ta phase.",
+    cam:"front",
+    anim:[
+      {t:0,   p:{hip:0,  knee:0,  torso:0, arm:-6, elb:10}},
+      {t:0.8, p:{hip:-14,knee:14, torso:3, arm:-30,elb:16}},
+      {t:2.2, p:{hip:-42,knee:42, torso:6, arm:-56,elb:22}},
+      {t:3.2, p:{hip:-60,knee:60, torso:8, arm:-68,elb:26}},
+      {t:8.2, p:{hip:-60,knee:60, torso:8, arm:-68,elb:26}},
+      {t:9.0, p:{hip:-44,knee:44, torso:6, arm:-56,elb:22}},
+      {t:10.2,p:{hip:0,  knee:0,  torso:0, arm:-6, elb:10}},
+      {t:11.2,p:{hip:0,  knee:0,  torso:0, arm:-6, elb:10}}
+    ],
+    props:[
+      {t:"kneebar",f:"kneeL",o:[.092,.012,-.085]},
+      {t:"cable",f:"kneeL",o:[-.12,.012,-.085],span:[-.34,.52,-.98]},
+      {t:"cable",f:"kneeR",o:[.12,.012,-.085],span:[.34,.52,-.98]},
+      {t:"post",o:[-.34,.58,-1.00]},
+      {t:"post",o:[.34,.58,-1.00]},
+      {t:"base",o:[0,.028,-1.00]}
+    ]
+  },
+
+  isowall:{
+    n:"Chaise isométrique murale", ph:["S1","S2","S3"], k:"iso",
+    tag:"Dépannage antalgique dans la journée",
+    params:{"Dosage":"2 × 45 s","Angle genou":"60°","Moment":"dès que la douleur monte au bureau",
+            "Pourquoi":"meilleur que la glace, et ça soigne en plus de soulager"},
+    steps:[
+      "Dos plaqué contre un mur, pieds avancés jusqu'à ce que tes tibias soient verticaux.",
+      "Glisse vers le bas jusqu'à 60° de flexion de genou — cuisses encore au-dessus de l'horizontale.",
+      "Pousse fort dans les talons et tiens 45 secondes.",
+      "Deux séries suffisent. L'effet antalgique dure 45 minutes à plusieurs heures."
+    ],
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:0,  knee:0, torso:0, arm:0, elb:0}},
+      {t:1.5,p:{hip:-60,knee:60,torso:0, arm:-5,elb:5}},
+      {t:7,  p:{hip:-60,knee:60,torso:0, arm:-5,elb:5}},
+      {t:8.4,p:{hip:0,  knee:0, torso:0, arm:0, elb:0}},
+      {t:9.4,p:{hip:0,  knee:0, torso:0, arm:0, elb:0}}
+    ],
+    props:[{t:"wall",o:[0,1.05,-.55]}]
+  },
+
+  legpress:{
+    n:"Presse à cuisses", ph:["S1","S2"], k:"force",
+    tag:"Isotonique lourd lent — amplitude bridée",
+    params:{"S1":"4 × 15, tempo 3 s / 3 s, 60-70 kg, amplitude 0-60°",
+            "S2 unipodale":"4 × 10 par jambe, tempo 3 s / 3 s",
+            "Repos":"2 min","Jours":"mardi, vendredi, samedi",
+            "Progression":"+5 kg seulement si la douleur à 24 h est stable ou en baisse"},
+    steps:[
+      "Règle le dossier pour que tes genoux ne dépassent pas 60° de flexion en position basse. C'est une amplitude volontairement courte.",
+      "Pieds largeur de bassin sur la plateforme, talons bien en contact.",
+      "Descends en 3 secondes pleines, comptées. La lenteur est le mécanisme actif : c'est le temps sous tension qui remodèle le tendon, pas la charge brute.",
+      "Remonte en 3 secondes, sans jamais verrouiller les genoux en haut.",
+      "Ne descends jamais plus bas que l'amplitude réglée, même si ça te semble facile."
+    ],
+    warn:"Jamais deux augmentations de charge consécutives. Une progression par semaine suffit.",
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:-70,knee:8, torso:0,arm:-95,elb:18}},
+      {t:2.4,p:{hip:-95,knee:60,torso:0,arm:-95,elb:18}},
+      {t:2.8,p:{hip:-95,knee:60,torso:0,arm:-95,elb:18}},
+      {t:5.2,p:{hip:-70,knee:8, torso:0,arm:-95,elb:18}},
+      {t:5.8,p:{hip:-70,knee:8, torso:0,arm:-95,elb:18}}
+    ],
+    root:{y:.52,rotX:-72}, look:.56, dist:3.1,
+    props:[{t:"back",f:"torso",o:[0,-.02,-.20],q:"torso"},
+           {t:"plate",f:"ankL",o:[0,-.02,.10],q:"kneeL"}]
+  },
+
+  legext:{
+    n:"Leg extension", ph:["S1"], k:"force",
+    tag:"Isolation quadriceps, amplitude courte",
+    params:{"Dosage":"3 × 15","Tempo":"3 s / 3 s","Charge":"15-20 kg",
+            "Amplitude":"0-50° seulement","Repos":"90 s","Jours":"mardi, vendredi, samedi"},
+    steps:[
+      "Assis, dos contre le dossier, le coussin posé juste au-dessus des chevilles.",
+      "Étends les genoux en 3 secondes, mais arrête-toi avant l'extension complète — garde une légère flexion.",
+      "Redescends en 3 secondes contrôlées. Ne laisse jamais le poids tomber.",
+      "Amplitude plafonnée à 50° : au-delà, la pression sur le tendon rotulien grimpe fortement."
+    ],
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:-88,knee:50,torso:0,arm:-20,elb:70}},
+      {t:2.4,p:{hip:-88,knee:8, torso:0,arm:-20,elb:70}},
+      {t:2.9,p:{hip:-88,knee:8, torso:0,arm:-20,elb:70}},
+      {t:5.3,p:{hip:-88,knee:50,torso:0,arm:-20,elb:70}},
+      {t:5.9,p:{hip:-88,knee:50,torso:0,arm:-20,elb:70}}
+    ],
+    root:{y:.52,rotX:0}, look:.54,
+    props:[{t:"seat",f:"torso",o:[0,-.05,-.09]},
+           {t:"back",f:"torso",o:[0,.14,-.30]},
+           {t:"roll",f:"ankL",o:[0,.01,.07]}]
+  },
+
+  hipthrust:{
+    n:"Hip thrust", ph:["S1","S2"], k:"force",
+    tag:"Décharge le quadriceps, charge le fessier",
+    params:{"Dosage":"3 × 12","Tempo":"2 s + 1 s de pause en haut","Charge":"40-50 kg",
+            "Repos":"90 s","Objectif":"un déficit fessier force le quadriceps à compenser"},
+    steps:[
+      "Haut du dos appuyé sur un banc, barre sur le pli de la hanche avec un coussin.",
+      "Pieds à plat, tibias verticaux en position haute — règle la distance des pieds pour ça.",
+      "Monte le bassin jusqu'à aligner épaules, hanches et genoux. Pas plus haut : pas de cambrure lombaire.",
+      "Verrouille les fessiers une seconde pleine en haut. C'est là que se fait le travail.",
+      "Redescends en contrôle sans poser complètement le bassin entre les répétitions."
+    ],
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:-112,knee:112,torso:-56,arm:24,elb:30},lift:0,   pz:0},
+      {t:1.6,p:{hip:-92, knee:92, torso:-86,arm:24,elb:30},lift:.153,pz:-.033},
+      {t:2.7,p:{hip:-92, knee:92, torso:-86,arm:24,elb:30},lift:.153,pz:-.033},
+      {t:4.1,p:{hip:-112,knee:112,torso:-56,arm:24,elb:30},lift:0,   pz:0},
+      {t:4.7,p:{hip:-112,knee:112,torso:-56,arm:24,elb:30},lift:0,   pz:0}
+    ],
+    root:{y:.27,rotX:0}, look:.38, dist:3.1,
+    drive:"lift", phz:["Extension de hanche","Verrouillage fessier tenu","Descente contrôlée"],
+    props:[{t:"bench",f:"armL",o:[0,-.11,-.04]},
+           {t:"bar",f:"torso",o:[0,.02,.085]},
+           {t:"disc",f:"torso",o:[-.56,.02,.085]},
+           {t:"disc",f:"torso",o:[.56,.02,.085]}]
+  },
+
+  calfseated:{
+    n:"Mollet assis — soléaire", ph:["S1","S2"], k:"soutien",
+    tag:"Le muscle le plus sous-travaillé de ton freinage",
+    params:{"Dosage":"4 × 20","Tempo":"3 s / 3 s","Charge":"20-30 kg","Fréquence":"tous les jours",
+            "Pourquoi":"le soléaire absorbe environ 30 % de la charge au freinage"},
+    steps:[
+      "Assis, genou plié à 90° — c'est cet angle qui met le soléaire au travail plutôt que les jumeaux.",
+      "Avant-pied sur le repose-pied, talon dans le vide.",
+      "Monte sur la pointe en 3 secondes, amplitude complète.",
+      "Redescends en 3 secondes jusqu'à un étirement net du mollet. Ne rebondis pas."
+    ],
+    warn:"Chez la grande majorité des joueurs, c'est le chaînon manquant. Ne saute pas cet exercice parce qu'il n'impressionne personne.",
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:-88,knee:88,torso:0,arm:-25,elb:60,ank:0}},
+      {t:2.3,p:{hip:-88,knee:88,torso:0,arm:-25,elb:60,ank:34}},
+      {t:2.7,p:{hip:-88,knee:88,torso:0,arm:-25,elb:60,ank:34}},
+      {t:5.0,p:{hip:-88,knee:88,torso:0,arm:-25,elb:60,ank:-18}},
+      {t:5.6,p:{hip:-88,knee:88,torso:0,arm:-25,elb:60,ank:0}}
+    ],
+    root:{y:.50,rotX:0}, look:.52,
+    props:[{t:"seat",f:"torso",o:[0,-.06,-.07]},
+           {t:"step",f:"ankL",o:[0,-.06,.11],lockY:.07}]
+  },
+
+  calfstand:{
+    n:"Mollet debout", ph:["S1","S2"], k:"soutien",
+    tag:"Composante propulsive",
+    params:{"Dosage":"3 × 15","Charge":"poids du corps, puis 10 kg","Fréquence":"tous les jours","Repos":"60 s"},
+    steps:[
+      "Avant-pied sur une marche, talons dans le vide, jambes tendues.",
+      "Monte sur la pointe, amplitude maximale, une seconde de pause en haut.",
+      "Descends lentement jusqu'à l'étirement complet du talon sous le niveau de la marche.",
+      "Appuie-toi légèrement pour l'équilibre, mais sans soulager le poids."
+    ],
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:0,knee:2,torso:0,arm:-12,elb:18,ank:0},  lift:0},
+      {t:1.5,p:{hip:0,knee:2,torso:0,arm:-12,elb:18,ank:32}, lift:.085},
+      {t:2.3,p:{hip:0,knee:2,torso:0,arm:-12,elb:18,ank:32}, lift:.085},
+      {t:3.8,p:{hip:0,knee:2,torso:0,arm:-12,elb:18,ank:-16},lift:-.04},
+      {t:4.5,p:{hip:0,knee:2,torso:0,arm:-12,elb:18,ank:0},  lift:0}
+    ],
+    props:[{t:"step",f:"ankL",o:[0,-.07,.02],lockY:.065}]
+  },
+
+  copenhagen:{
+    n:"Copenhagen adducteur", ph:["S1","S2","S3"], k:"soutien",
+    tag:"Stabilité latérale du bassin — spécifique latéral droit",
+    params:{"Dosage":"3 × 20 s par côté","Variante S1":"genou plié (version courte)",
+            "Fréquence":"tous les jours","Repos":"45 s"},
+    steps:[
+      "Allongé sur le côté, avant-bras au sol sous l'épaule, coude à 90°.",
+      "Pose la face interne du genou de la jambe supérieure sur un banc — genou plié, c'est la version allégée.",
+      "Décolle le bassin et la jambe inférieure du sol. Ton corps forme une ligne droite de la tête aux pieds.",
+      "Tiens 20 secondes sans laisser le bassin retomber ni tourner vers l'avant.",
+      "Change de côté. Les deux côtés, toujours."
+    ],
+    cam:"front",
+    anim:[
+      {t:0,  p:{hip:-5,knee:3,torso:0,arm:-6,armZ:-88,armZ2:44,elb:84,freeHip:-18,freeKnee:86,abd:22},lift:-.055},
+      {t:1.3,p:{hip:-5,knee:3,torso:0,arm:-6,armZ:-88,armZ2:44,elb:84,freeHip:-18,freeKnee:86,abd:22},lift:0},
+      {t:5.6,p:{hip:-5,knee:3,torso:0,arm:-6,armZ:-88,armZ2:44,elb:84,freeHip:-18,freeKnee:86,abd:22},lift:0},
+      {t:6.8,p:{hip:-5,knee:3,torso:0,arm:-6,armZ:-88,armZ2:44,elb:84,freeHip:-18,freeKnee:86,abd:22},lift:-.055}
+    ],
+    root:{y:.42,rotZ:86}, look:.40,
+    drive:"lift", phz:["Montée en appui","Maintien gainé — 20 s","Relâchement au sol"],
+    props:[{t:"bench",f:"kneeR",o:[0,-.09,0]}]
+  },
+
+  sideplank:{
+    n:"Gainage latéral + élévation", ph:["S1","S2","S3"], k:"soutien",
+    tag:"Contrôle du bassin en appui unipodal",
+    params:{"Dosage":"3 × 30 s par côté","Fréquence":"tous les jours","Repos":"45 s"},
+    steps:[
+      "Appui sur l'avant-bras et le pied, corps en ligne droite, bassin haut.",
+      "Monte la jambe supérieure à environ 30° et tiens-la là pendant toute la durée.",
+      "Garde les hanches empilées l'une sur l'autre — ne laisse pas le bassin tourner vers le sol.",
+      "Si tu trembles, c'est normal. Si le bassin tombe, arrête la série."
+    ],
+    cam:"front",
+    anim:[
+      {t:0,  p:{hip:-2,knee:2,torso:0,arm:-6,armZ:-88,armZ2:30,elb:84,abd:0}},
+      {t:1.4,p:{hip:-2,knee:2,torso:0,arm:-6,armZ:-88,armZ2:30,elb:84,abd:30}},
+      {t:5.4,p:{hip:-2,knee:2,torso:0,arm:-6,armZ:-88,armZ2:30,elb:84,abd:30}},
+      {t:6.6,p:{hip:-2,knee:2,torso:0,arm:-6,armZ:-88,armZ2:30,elb:84,abd:0}}
+    ],
+    root:{y:.42,rotZ:86}, look:.40, props:[]
+  },
+
+  glutebridge:{
+    n:"Pont fessier unipodal", ph:["S1","S2"], k:"soutien",
+    tag:"Corrige la compensation quadricipitale",
+    params:{"Dosage":"3 × 12 par côté","Tempo":"2 s + 1 s de pause","Fréquence":"tous les jours","Repos":"45 s"},
+    steps:[
+      "Allongé sur le dos, un pied au sol genou plié, l'autre jambe tendue en l'air.",
+      "Pousse dans le talon au sol et monte le bassin jusqu'à l'alignement épaule-hanche-genou.",
+      "Une seconde de verrouillage fessier en haut, hanches à la même hauteur — pas d'affaissement du côté libre.",
+      "Redescends lentement sans poser complètement entre les répétitions."
+    ],
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:-135,knee:135,torso:-88,arm:-2,elb:6,freeHip:-115,freeKnee:6},lift:0,  pz:0},
+      {t:1.6,p:{hip:-98, knee:98, torso:-88,arm:-2,elb:6,freeHip:-96, freeKnee:5},lift:.26,pz:-.128},
+      {t:2.6,p:{hip:-98, knee:98, torso:-88,arm:-2,elb:6,freeHip:-96, freeKnee:5},lift:.26,pz:-.128},
+      {t:4.1,p:{hip:-135,knee:135,torso:-88,arm:-2,elb:6,freeHip:-115,freeKnee:6},lift:0,  pz:0},
+      {t:4.7,p:{hip:-135,knee:135,torso:-88,arm:-2,elb:6,freeHip:-115,freeKnee:6},lift:0,  pz:0}
+    ],
+    root:{y:.11,rotX:0}, look:.26, dist:3.0,
+    drive:"lift", phz:["Montée du bassin","Verrouillage haut 1 s","Descente contrôlée"],
+    props:[{t:"mat",o:[0,.022,.10]}]
+  },
+
+  declinesquat:{
+    n:"Squat déclin unipodal", ph:["S2","S3"], k:"force", star:true,
+    tag:"L'exercice le plus documenté sur cette pathologie",
+    params:{"Dosage":"3 × 10 par jambe","Tempo":"4 s à la descente, remontée aidée par l'autre jambe",
+            "Plan":"planche inclinée à 25°","Charge":"poids du corps, puis haltère si indolore",
+            "Repos":"2 min","Douleur tolérée":"≤ 4/10","Double emploi":"c'est aussi ton test de mesure quotidien"},
+    steps:[
+      "Place-toi sur une planche inclinée à 25°, talon surélevé, orteils vers le bas.",
+      "L'inclinaison retire la contribution du mollet et isole le tendon rotulien : c'est tout l'intérêt du déclin par rapport à un squat au sol.",
+      "Appui sur la jambe atteinte seule. Descends en 4 secondes pleines jusqu'à 60° de flexion.",
+      "Remonte en t'aidant de l'autre jambe — la phase excentrique est celle qui compte.",
+      "Garde le tronc droit et le genou dans l'axe du pied. Pas de valgus, pas de genou qui rentre.",
+      "Filme-toi de face une fois par semaine : c'est ton meilleur outil de contrôle du valgus."
+    ],
+    warn:"Ne l'introduis qu'une fois ta douleur passée sous 3/10. En phase réactive, cet exercice aggrave.",
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:-3, knee:8, torso:3, arm:-30,elb:20,ank:-18,freeHip:8, freeKnee:38,freeAnk:0}},
+      {t:3.2,p:{hip:-35,knee:60,torso:15,arm:-58,elb:32,ank:-18,freeHip:12,freeKnee:46,freeAnk:0}},
+      {t:3.8,p:{hip:-35,knee:60,torso:15,arm:-58,elb:32,ank:-18,freeHip:12,freeKnee:46,freeAnk:0}},
+      {t:5.1,p:{hip:-3, knee:8, torso:3, arm:-30,elb:20,ank:-18,freeHip:8, freeKnee:38,freeAnk:0}},
+      {t:5.8,p:{hip:-3, knee:8, torso:3, arm:-30,elb:20,ank:-18,freeHip:8, freeKnee:38,freeAnk:0}}
+    ],
+    props:[{t:"board",f:"ankL",o:[0,-.075,.03],r:[-25,0,0],lockY:.095}]
+  },
+
+  nordic:{
+    n:"Nordic hamstring", ph:["S2","S3"], k:"force",
+    tag:"Équilibre agoniste / antagoniste",
+    params:{"Dosage":"S2 : 3 × 6 · S3 : 3 × 8","Tempo":"descente en 4 s","Repos":"2 min",
+            "Objectif":"un déséquilibre quadriceps/ischios laisse le tendon rotulien tout encaisser"},
+    steps:[
+      "À genoux, chevilles bloquées par un partenaire ou un appareil. Genoux sur un tapis.",
+      "Corps gainé en ligne droite des genoux aux épaules.",
+      "Descends vers l'avant le plus lentement possible, en 4 secondes, en retenant avec les ischios.",
+      "Amortis avec les mains quand tu ne peux plus retenir, puis repousse-toi pour revenir.",
+      "Six répétitions suffisent. C'est un exercice court et très exigeant."
+    ],
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:0,knee:88,torso:0,prx:0, arm:14, elb:28},lift:0,    pz:0},
+      {t:1.2,p:{hip:0,knee:68,torso:0,prx:20,arm:0,  elb:34},lift:-.030,pz:.170},
+      {t:2.4,p:{hip:0,knee:46,torso:0,prx:42,arm:-28,elb:52},lift:-.127,pz:.332},
+      {t:3.6,p:{hip:0,knee:26,torso:0,prx:62,arm:-62,elb:78},lift:-.263,pz:.438},
+      {t:4.3,p:{hip:0,knee:26,torso:0,prx:62,arm:-62,elb:78},lift:-.263,pz:.438},
+      {t:5.6,p:{hip:0,knee:88,torso:0,prx:0, arm:14, elb:28},lift:0,    pz:0},
+      {t:6.2,p:{hip:0,knee:88,torso:0,prx:0, arm:14, elb:28},lift:0,    pz:0}
+    ],
+    root:{y:.516,rotX:0}, look:.42,
+    drive:"prx", phz:["Descente excentrique","Point limite tenu","Retour assisté aux mains"],
+    props:[{t:"mat",o:[0,.022,-.15]},{t:"strap",f:"ankL",o:[0,.03,0]}]
+  },
+
+  boxsquat:{
+    n:"Box squat", ph:["S2","S3"], k:"force",
+    tag:"Charge lourde lente, profondeur garantie",
+    params:{"S2":"4 × 10, tempo 3 s / 3 s, ~70-75 % du 1RM",
+            "S3":"4 × 6-8, tempo 2 s / 2 s","Repos":"3 min",
+            "Hauteur du banc":"réglée pour ne pas dépasser 70° de flexion"},
+    steps:[
+      "Place un banc ou une box derrière toi, réglé pour que tes cuisses restent au-dessus de l'horizontale.",
+      "Barre sur le haut du dos, pieds largeur d'épaules, orteils légèrement ouverts.",
+      "Descends en 3 secondes en reculant les hanches, poitrine haute.",
+      "Effleure le banc sans t'y asseoir ni rebondir dessus.",
+      "Remonte en 3 secondes en poussant dans les talons, genoux dans l'axe des pieds.",
+      "La box n'est pas un siège : c'est un repère de profondeur qui t'empêche de descendre trop bas."
+    ],
+    warn:"Les squats profonds au-delà de 100° de flexion sont probablement à l'origine de ta tendinopathie. La box existe pour t'empêcher d'y retourner.",
+    cam:"side",
+    anim:[
+      {t:0,  p:{hip:-3, knee:3, torso:0, arm:34,elb:120}},
+      {t:2.6,p:{hip:-62,knee:68,torso:22,arm:34,elb:120}},
+      {t:3.1,p:{hip:-62,knee:68,torso:22,arm:34,elb:120}},
+      {t:5.7,p:{hip:-3, knee:3, torso:0, arm:34,elb:120}},
+      {t:6.3,p:{hip:-3, knee:3, torso:0, arm:34,elb:120}}
+    ],
+    props:[{t:"box",f:"torso",o:[0,-.46,-.36],lockY:.21},
+           {t:"bar",f:"armL",o:[.59,.035,-.09]},
+           {t:"disc",f:"armL",o:[.04,.035,-.09]},
+           {t:"disc",f:"armL",o:[1.14,.035,-.09]}]
+  },
+
+  cmj:{
+    n:"Saut vertical — CMJ", ph:["S3"], k:"plyo",
+    tag:"Stockage et restitution d'énergie",
+    params:{"J15":"3 × 6 à 50 % de la hauteur max","J17":"4 × 6 à 70 %",
+            "J19":"drop jump depuis 20 cm, contact au sol < 250 ms",
+            "Jours":"mercredi et samedi, jamais deux jours de suite",
+            "Règle":"on ne passe au palier suivant qu'avec zéro douleur à 24 h"},
+    steps:[
+      "Debout, pieds largeur de bassin, bras libres.",
+      "Descends vite jusqu'à mi-squat puis saute immédiatement — pas de pause en bas, c'est le contre-mouvement qui charge le tendon.",
+      "Atterris sur l'avant-pied puis déroule vers le talon, genou strictement au-dessus du pied.",
+      "Amortis avec hanche, genou et cheville à la fois. Jamais le genou seul.",
+      "Aucun valgus : si ton genou rentre vers l'intérieur à l'atterrissage, arrête la série et filme-toi."
+    ],
+    warn:"C'est ici que se produisent 80 % des rechutes. La progression ne se négocie pas : un palier tous les 48 h, et seulement si le KPI des 24 h est au vert.",
+    cam:"q",
+    anim:[
+      {t:0,   p:{hip:-3, knee:3, torso:0, arm:-10, elb:12,ank:0}},
+      {t:0.45,p:{hip:-38,knee:58,torso:22,arm:42,  elb:10,ank:-14}},
+      {t:0.72,p:{hip:-4, knee:4, torso:4, arm:-150,elb:5, ank:36}, lift:.30},
+      {t:1.05,p:{hip:-8, knee:10,torso:6, arm:-120,elb:8, ank:24}, lift:.10},
+      {t:1.35,p:{hip:-32,knee:52,torso:18,arm:-30, elb:15,ank:-8}},
+      {t:2.0, p:{hip:-3, knee:3, torso:0, arm:-10, elb:12,ank:0}},
+      {t:2.7, p:{hip:-3, knee:3, torso:0, arm:-10, elb:12,ank:0}}
+    ],
+    segs:[{t:0,l:"Position de départ"},{t:.30,l:"Contre-mouvement rapide"},
+          {t:.66,l:"Impulsion et vol"},{t:1.00,l:"Atterrissage avant-pied"},
+          {t:1.30,l:"Amorti hanche-genou-cheville"},{t:1.95,l:"Replacement"}],
+    props:[]
+  },
+
+  decel:{
+    n:"Décélération contrôlée", ph:["S3"], k:"plyo", star:true,
+    tag:"Ton déficit mesuré — ratio accélération/décélération à 1,84",
+    params:{"J15":"course 10 m à 60 %, arrêt en 3 appuis, 6 répétitions",
+            "J19":"course à 75 %, arrêt en 2 appuis, 8 répétitions",
+            "Repos":"60 s entre répétitions","Jours":"mercredi et samedi",
+            "Pourquoi":"un déficit de freinage excentrique transfère au tendon ce que le quadriceps ne contrôle pas"},
+    steps:[
+      "Cours 10 mètres à l'intensité prévue, sans chercher la vitesse maximale.",
+      "Arrête-toi complètement sur le nombre d'appuis prévu — trois d'abord, puis deux quand c'est propre.",
+      "À chaque appui de freinage : hanches basses et vers l'arrière, poitrine haute, genou dans l'axe.",
+      "Le freinage se fait par la hanche et le quadriceps en excentrique, pas en bloquant le genou tendu.",
+      "Reviens en marchant. Repos complet de 60 secondes : c'est de la qualité, pas du volume.",
+      "Progresse sur l'intensité de course avant de réduire le nombre d'appuis."
+    ],
+    warn:"C'est la cause probable de ta tendinopathie. Travaille-le avec plus de sérieux que les sprints.",
+    cam:"q",
+    anim:[
+      {t:0,   p:{hip:-42,knee:52,torso:14,arm:-55,elb:85,freeHip:32, freeKnee:16,ank:-8}},
+      {t:0.34,p:{hip:32, knee:18,torso:14,arm:55, elb:85,freeHip:-44,freeKnee:56,ank:16}},
+      {t:0.68,p:{hip:-42,knee:52,torso:14,arm:-55,elb:85,freeHip:32, freeKnee:16,ank:-8}},
+      {t:1.02,p:{hip:32, knee:18,torso:14,arm:55, elb:85,freeHip:-44,freeKnee:56,ank:16}},
+      {t:1.42,p:{hip:-26,knee:16,torso:-6, arm:-18,elb:70,freeHip:24, freeKnee:40,ank:-18}},
+      {t:1.86,p:{hip:-20,knee:38,torso:-14,arm:10, elb:62,freeHip:-24,freeKnee:22,ank:-12}},
+      {t:2.30,p:{hip:-16,knee:50,torso:-10,arm:2,  elb:52,freeHip:-12,freeKnee:46,ank:-4}},
+      {t:3.2, p:{hip:-16,knee:50,torso:-10,arm:2,  elb:52,freeHip:-12,freeKnee:46,ank:-4}},
+      {t:3.9, p:{hip:-42,knee:52,torso:14,arm:-55,elb:85,freeHip:32, freeKnee:16,ank:-8}}
+    ],
+    segs:[{t:0,l:"Course linéaire à 60 %"},{t:1.38,l:"1er appui de freinage"},
+          {t:1.82,l:"2e appui — hanches basses"},{t:2.26,l:"Arrêt complet tenu"},
+          {t:3.3,l:"Retour en marchant"}],
+    props:[{t:"line",o:[-1.1,.004,0]},{t:"line",o:[0,.004,0]},{t:"line",o:[1.1,.004,0]}]
+  }
+};
+
+/* --------- Programme par phase et par jour (0=dim … 6=sam) --------- */
+const BLOCKS = {
+  isoAM:   {n:"Bloc A — Isométrie",            k:"iso",     when:"6 h 00", s:"Spanish squat 5 × 45 s, repos 2 min, genou 60°", ex:"spanish"},
+  isoPrime:{n:"Bloc A — Priming isométrique",  k:"iso",     when:"6 h 00", s:"Spanish squat 2 × 45 s avant la charge lourde", ex:"spanish"},
+  isoPM:   {n:"Isométrie du soir",             k:"iso",     when:"21 h 00",s:"Spanish squat 3 × 45 s, repos 90 s", ex:"spanish"},
+  forceS1: {n:"Bloc B — Isotonique allégé",    k:"force",   when:"6 h 15", s:"Presse 4 × 15 · Leg ext 3 × 15 · Hip thrust 3 × 12", ex:"legpress"},
+  forceS1f:{n:"Bloc B — reporté après l'iftar",k:"force",   when:"20 h 30",s:"Optionnel, 1 h 30 après la rupture du jeûne", ex:"legpress"},
+  hsr:     {n:"Bloc B — Charge lourde lente",  k:"force",   when:"6 h 10", s:"Box squat · Presse unipodale · Squat déclin · Nordic", ex:"declinesquat"},
+  soutien: {n:"Bloc C — Chaîne de soutien",    k:"soutien", when:"6 h 30", s:"Mollets · Copenhagen · Gainage · Pont fessier", ex:"calfseated"},
+  soutienS:{n:"Bloc C — Chaîne de soutien",    k:"soutien", when:"6 h 40", s:"Version courte 10 min : mollets + Copenhagen", ex:"calfseated"},
+  cardio:  {n:"Vélo assis",                    k:"cardio",  when:"19 h 30",s:"30 min, selle haute, 90-100 rpm, résistance faible"},
+  mobil:   {n:"Mobilité et récupération",      k:"soutien", when:"6 h 30", s:"20 min, chaleur préalable 10 min sur le genou"},
+  plyo:    {n:"Pliométrie progressive",        k:"plyo",    when:"6 h 10", s:"Pogo · CMJ · hop unipodal selon le palier du jour", ex:"cmj"},
+  decel:   {n:"Décélérations",                 k:"plyo",    when:"6 h 40", s:"10 min — ton déficit mesuré", ex:"decel"},
+  course:  {n:"Course linéaire",               k:"terrain", when:"—",      s:"25 min sur herbe : 5 × 3 min facile, 1 min de marche"},
+  terrain: {n:"Terrain — course et ballon",    k:"terrain", when:"19 h 30",s:"Accélérations puis centres selon le palier"},
+  ballon:  {n:"Ballon",                        k:"terrain", when:"—",      s:"20 min : conduite, passes pied intérieur, contrôles"},
+  club:    {n:"Entraînement club",             k:"terrain", when:"20 h 30",s:"Participation adaptée — préviens ton coach"},
+  reposC:  {n:"Repos complet",                 k:"soutien", when:"—",      s:"Aucune charge. La récupération fait partie du traitement"}
+};
+
+const PROG = {
+  S1:{
+    label:"Semaine 1 — Désensibilisation",
+    goal:"Objectif unique : passer de 5/10 à 3/10 ou moins au squat déclin. Rien d'autre.",
+    days:{
+      1:["isoAM","soutien","isoPM"],
+      2:["isoAM","forceS1","soutien","cardio","isoPM"],
+      3:["isoAM","soutien","isoPM"],
+      4:["isoAM","soutien","isoPM"],
+      5:["isoAM","forceS1","soutien","cardio","isoPM"],
+      6:["isoAM","forceS1","soutien","isoPM"],
+      0:["isoAM","mobil","isoPM"]
+    },
+    fast:{1:["forceS1f"],4:["forceS1f"]},
+    ban:"Interdit : course · sauts · frappes · centres · changements de direction · ballon en mouvement · amplitude au-delà de 60°."
+  },
+  S2:{
+    label:"Semaine 2 — Charge lourde lente",
+    goal:"Réintroduction de la course linéaire et du ballon à l'arrêt. Le squat déclin devient un exercice, plus seulement un test.",
+    days:{
+      1:["isoAM","soutienS","isoPM"],
+      2:["isoPrime","hsr","soutienS","isoPM"],
+      3:["isoAM","course","ballon","club","isoPM"],
+      4:["isoAM","soutienS","isoPM"],
+      5:["isoPrime","hsr","soutienS","isoPM"],
+      6:["isoPrime","hsr","ballon","isoPM"],
+      0:["isoAM","course","mobil","isoPM"]
+    },
+    fast:{1:[],4:[]},
+    ban:"Interdit : frappes · centres · duels · virages serrés · changements de direction · crampons."
+  },
+  S3:{
+    label:"Semaine 3 — Stockage d'énergie et geste football",
+    goal:"Retour progressif au sprint, aux changements de direction et aux centres. Volume de frappes plafonné à 15 par séance.",
+    days:{
+      1:["isoAM","soutienS","isoPM"],
+      2:["isoPrime","hsr","terrain","isoPM"],
+      3:["isoPrime","plyo","decel","club","isoPM"],
+      4:["isoAM","mobil","isoPM"],
+      5:["isoPrime","hsr","isoPM"],
+      6:["isoPrime","plyo","decel","terrain","isoPM"],
+      0:["isoAM","reposC","isoPM"]
+    },
+    fast:{1:[],4:[]},
+    ban:"Plafond strict : 15 frappes par séance, pas une de plus. Compte-les."
+  }
+};
+
+const SUPPS = [
+  {id:"colg", n:"Collagène hydrolysé 15 g + vitamine C 500 mg", when:"5 h 00", s:"Dans 250 ml d'eau, 60 min avant la charge. Timing non négociable."},
+  {id:"iso1", n:"Isolate 30 g", when:"7 h 15", s:"Avec 40 g de flocons d'avoine et une banane"},
+  {id:"d3",   n:"Vitamine D3 4000 UI", when:"matin", s:"Avec un corps gras. À réajuster après dosage de la 25-OH-D."},
+  {id:"crea", n:"Créatine 5 g", when:"indifférent", s:"Constance avant timing. Les jours de jeûne : après la rupture."},
+  {id:"om3",  n:"Oméga-3 — 2,5 g EPA+DHA", when:"20 h 00", s:"Au repas du soir, absorption lipidique"},
+  {id:"mg",   n:"Magnésium bisglycinate 350 mg", when:"21 h 30", s:"1 h avant le coucher"},
+  {id:"iso2", n:"Isolate 25 g", when:"22 h 00", s:"Uniquement les jours de charge lourde", heavyOnly:true}
+];
+
+/* Dosages du minuteur. work = maintien chronométré ; reps + tempo = série comptée
+   à la main, le minuteur enchaîne alors le repos tout seul. sides:2 = les deux côtés. */
+const TMR = {
+  spanish:     {work:45, rest:120, series:5, sides:1},
+  isowall:     {work:45, rest:90,  series:2, sides:1},
+  copenhagen:  {work:20, rest:45,  series:3, sides:2},
+  sideplank:   {work:30, rest:45,  series:3, sides:2},
+  legpress:    {reps:15, tempo:[3,3], rest:120, series:4, sides:1},
+  legext:      {reps:15, tempo:[3,3], rest:90,  series:3, sides:1},
+  hipthrust:   {reps:12, tempo:[2,1], rest:90,  series:3, sides:1},
+  calfseated:  {reps:20, tempo:[3,3], rest:60,  series:4, sides:1},
+  calfstand:   {reps:15, tempo:[2,2], rest:60,  series:3, sides:1},
+  glutebridge: {reps:12, tempo:[2,1], rest:45,  series:3, sides:2},
+  declinesquat:{reps:10, tempo:[4,2], rest:120, series:3, sides:1},
+  nordic:      {reps:6,  tempo:[4,0], rest:120, series:3, sides:1},
+  boxsquat:    {reps:10, tempo:[3,3], rest:180, series:4, sides:1},
+  cmj:         {reps:6,              rest:90,  series:3, sides:1},
+  decel:       {reps:1,              rest:60,  series:6, sides:1}
+};
+
+const KPIS = [
+  {id:"pain",  q:"Douleur au squat déclin unipodal", h:"Planche à 25°, un squat lent jusqu'à 60° de flexion. Toujours la même planche, le même tempo.", type:"scale", base:5},
+  {id:"stiff", q:"Raideur matinale", h:"Nombre de minutes entre le lever et la disparition de la raideur.", type:"num", unit:"minutes", base:3},
+  {id:"palp",  q:"Douleur à la palpation", h:"Pression ferme du pouce sur le pôle inférieur de la rotule.", type:"scale"},
+  {id:"postIso",q:"Douleur juste après le Bloc A", h:"Immédiatement après la dernière série d'isométrie. Elle doit être plus basse qu'avant.", type:"scale"},
+  {id:"rpe",   q:"RPE de la séance", h:"Effort perçu sur 10. Cible 6-7. Au-delà de 8 régulièrement, le dosage est trop fort.", type:"scale"}
+];
+
+/* VISA-P — adaptation française des 8 items et de leur barème (Visentini et al., 1998).
+   Les énoncés sont reformulés, la structure de score est celle de l'instrument :
+   items 1 à 6 sur 10 points, item 7 sur 10, item 8 sur 30. Total 100. */
+const VISA = [
+  {id:"q1", t:"Combien de temps peux-tu rester assis sans douleur au genou ?",
+   h:"Position assise prolongée, genou fléchi. Compte en minutes.", kind:"scale",
+   lo:"0 min", hi:"10 min ou plus"},
+  {id:"q2", t:"As-tu mal en descendant un escalier à allure normale ?",
+   h:"Marche après marche, pas en te tenant ni en descendant de côté.", kind:"scale",
+   lo:"douleur sévère", hi:"aucune douleur"},
+  {id:"q3", t:"As-tu mal en tendant complètement le genou, sans charge ?",
+   h:"Assis ou allongé, jambe en l'air, extension active maximale.", kind:"scale",
+   lo:"douleur sévère", hi:"aucune douleur"},
+  {id:"q4", t:"As-tu mal sur une fente complète en charge ?",
+   h:"Fente avant complète, tout le poids du corps dessus.", kind:"scale",
+   lo:"douleur sévère", hi:"aucune douleur"},
+  {id:"q5", t:"Le squat te pose-t-il un problème ?",
+   h:"Squat au poids du corps, amplitude habituelle.", kind:"scale",
+   lo:"impossible", hi:"aucun problème"},
+  {id:"q6", t:"As-tu mal pendant ou juste après 10 sauts sur une jambe ?",
+   h:"Sur la jambe atteinte. Si tu ne peux pas les faire, réponds 0.", kind:"scale",
+   lo:"impossible / douleur sévère", hi:"aucune douleur"},
+  {id:"q7", t:"Où en es-tu de ta pratique sportive en ce moment ?", kind:"opts",
+   h:"Ta situation réelle cette semaine.",
+   o:[["Aucune activité sportive",0],
+      ["Entraînement adapté, compétition adaptée ou arrêtée",4],
+      ["Entraînement complet et compétition, mais pas au niveau d'avant les symptômes",7],
+      ["Compétition au même niveau qu'avant les symptômes, ou mieux",10]]},
+  {id:"q8", t:"Combien de temps peux-tu t'entraîner ou jouer ?", kind:"branch",
+   h:"Choisis d'abord la situation qui te correspond, puis la durée.",
+   b:[{k:"a", l:"Je m'entraîne sans aucune douleur au genou",
+       o:[["Je ne m'entraîne pas",0],["1 à 10 minutes",7],["11 à 20 minutes",14],["21 à 30 minutes",21],["Plus de 30 minutes",30]]},
+      {k:"b", l:"J'ai une douleur, mais elle ne m'empêche pas de finir",
+       o:[["Je ne m'entraîne pas",0],["1 à 10 minutes",4],["11 à 20 minutes",10],["21 à 30 minutes",14],["Plus de 30 minutes",20]]},
+      {k:"c", l:"La douleur m'empêche de finir ma séance",
+       o:[["Je ne m'entraîne pas",0],["1 à 10 minutes",2],["11 à 20 minutes",5],["21 à 30 minutes",7],["Plus de 30 minutes",10]]}]}
+];
+
+const WKPIS = [
+  {id:"visa", q:"Score VISA-P", h:"Questionnaire validé sur 100, cinq minutes. Cible J7 : progression. Cible J21 : 80 ou plus.", type:"num", unit:"/ 100", max:100},
+  {id:"reps", q:"Répétitions avant douleur 4/10", h:"Squat déclin unipodal, compte les répétitions. Cible J21 : 20 ou plus.", type:"num", unit:"reps", max:60},
+  {id:"sym",  q:"Symétrie du saut unipodal", h:"CMJ unipodal, hauteur ou distance, jambe gauche ÷ jambe droite. À partir de J14 seulement. Cible : plus de 90 %.", type:"num", unit:"%", max:120}
+];
+
+/* ============================================================
+   2. STOCKAGE
+   ============================================================ */
+const KEY = "tendon:v1";
+let DB = {days:{}, weeks:{}, set:{phase:"S1", start:todayISO()}};
+
+function todayISO(d){ const x = d||new Date(); return [x.getFullYear(), String(x.getMonth()+1).padStart(2,"0"), String(x.getDate()).padStart(2,"0")].join("-"); }
+function shiftISO(iso,n){ const [y,m,d]=iso.split("-").map(Number); const x=new Date(y,m-1,d); x.setDate(x.getDate()+n); return todayISO(x); }
+function isoDow(iso){ const [y,m,d]=iso.split("-").map(Number); return new Date(y,m-1,d).getDay(); }
+function weekKey(iso){ const [y,m,d]=iso.split("-").map(Number); const x=new Date(y,m-1,d); const dow=(x.getDay()+6)%7; x.setDate(x.getDate()-dow); return "w"+todayISO(x); }
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ const p = JSON.parse(raw); DB = Object.assign(DB, p); DB.days=p.days||{}; DB.weeks=p.weeks||{}; DB.set=Object.assign({phase:"S1",start:todayISO()}, p.set||{}); }
+  }catch(e){ /* stockage indisponible : l'app fonctionne, rien n'est conservé */ }
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
+  catch(e){ /* quota ou mode privé : on continue sans bloquer l'usage */ }
+}
+function day(iso){ if(!DB.days[iso]) DB.days[iso]={blocks:{},supps:{},kpi:{}}; const d=DB.days[iso]; d.blocks=d.blocks||{}; d.supps=d.supps||{}; d.kpi=d.kpi||{}; return d; }
+function week(k){ if(!DB.weeks[k]) DB.weeks[k]={}; return DB.weeks[k]; }
+
+/* ============================================================
+   3. LOGIQUE PROGRAMME
+   ============================================================ */
+const DOWN = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const DOWS = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
+const FASTD = [1,4];
+
+function planFor(iso){
+  const ph = PROG[DB.set.phase], dow = isoDow(iso);
+  let ids = (ph.days[dow]||[]).slice();
+  if(FASTD.includes(dow)) ids = ids.concat(ph.fast[dow]||[]);
+  return ids;
+}
+function protoDay(iso){ return {phase:DB.set.phase, dow:isoDow(iso), fast:FASTD.includes(isoDow(iso))}; }
+function heavyDay(iso){ return planFor(iso).some(id=>["forceS1","forceS1f","hsr"].includes(id)); }
+function protoDayNum(iso){
+  const s = DB.set.start||iso;
+  const a = new Date(s.split("-").map((v,i)=>i===1?v-1:+v)[0], +s.split("-")[1]-1, +s.split("-")[2]);
+  const b = new Date(+iso.split("-")[0], +iso.split("-")[1]-1, +iso.split("-")[2]);
+  return Math.round((b-a)/86400000)+1;
+}
+
+/* ============================================================
+   4. RENDU — écran Aujourd'hui
+   ============================================================ */
+const T = todayISO();
+const $ = s=>document.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;};
+const CHK = '<svg viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6"/></svg>';
+
+function renderToday(){
+  const d = day(T), ids = planFor(T), ph = PROG[DB.set.phase];
+  $("#hday").textContent = DOWS[isoDow(T)]+" · J"+protoDayNum(T)+" · "+DB.set.phase;
+  $("#todayTitle").textContent = ph.label;
+  $("#todayLede").textContent = ph.goal;
+
+  const wrap = $("#blocks"); wrap.innerHTML="";
+  ids.forEach(id=>{
+    const b = BLOCKS[id]; if(!b) return;
+    const done = !!d.blocks[id];
+    const r = el("div","row"+(done?" done":"")); r.dataset.k=b.k;
+    r.appendChild(el("span","bar"));
+    const c = el("button","chk",CHK);
+    c.setAttribute("aria-pressed", done?"true":"false");
+    c.setAttribute("aria-label",(done?"Décocher":"Cocher")+" "+b.n);
+    c.onclick=()=>{ if(d.blocks[id]) delete d.blocks[id]; else d.blocks[id]=1; save(); renderToday(); renderWeek(); };
+    r.appendChild(c);
+    const body = el("div","body");
+    body.appendChild(el("div","name",b.n));
+    body.appendChild(el("div","sub",b.s));
+    if(b.when!=="—") body.appendChild(el("div","when",b.when));
+    r.appendChild(body);
+    if(b.ex && TMR[b.ex]){
+      const tg=el("button","go","⏱");
+      tg.title="Minuteur";
+      tg.setAttribute("aria-label","Minuteur — "+b.n);
+      tg.onclick=()=>openTimer(b.ex);
+      r.appendChild(tg);
+    }
+    if(b.ex){ const g=el("button","go","3D"); g.onclick=()=>openViewer(b.ex); r.appendChild(g); }
+    wrap.appendChild(r);
+  });
+
+  const sw = $("#supps"); sw.innerHTML="";
+  const hv = heavyDay(T);
+  SUPPS.filter(s=>!s.heavyOnly||hv).forEach(s=>{
+    const done = !!d.supps[s.id];
+    const r = el("div","row"+(done?" done":""));
+    r.appendChild(el("span","bar"));
+    const c = el("button","chk",CHK);
+    c.setAttribute("aria-pressed", done?"true":"false");
+    c.setAttribute("aria-label",(done?"Décocher":"Cocher")+" "+s.n);
+    c.onclick=()=>{ if(d.supps[s.id]) delete d.supps[s.id]; else d.supps[s.id]=1; save(); renderToday(); };
+    r.appendChild(c);
+    const body = el("div","body");
+    body.appendChild(el("div","name",s.n));
+    body.appendChild(el("div","sub",s.s));
+    body.appendChild(el("div","when",s.when));
+    r.appendChild(body);
+    sw.appendChild(r);
+  });
+
+  const nb = ids.filter(i=>d.blocks[i]).length;
+  const ns = SUPPS.filter(s=>(!s.heavyOnly||hv)&&d.supps[s.id]).length;
+  const nsT = SUPPS.filter(s=>!s.heavyOnly||hv).length;
+  $("#todayStat").innerHTML =
+    stat(nb+"/"+ids.length,"Blocs faits")+
+    stat(ns+"/"+nsT,"Compléments")+
+    stat(d.kpi.pain!=null?d.kpi.pain:"—","Douleur")+
+    stat(streak()+" j","Série");
+
+  /* La semaine active doit correspondre au jour de protocole : J1-J7 en S1, J8-J14 en S2,
+     J15 et plus en S3. Au-delà, c'est presque toujours un clic involontaire. */
+  const pw = $("#phaseWarn");
+  const jour = protoDayNum(T);
+  const attendu = jour<=7 ? "S1" : (jour<=14 ? "S2" : "S3");
+  const iA = PHORDER.indexOf(DB.set.phase), iE = PHORDER.indexOf(attendu);
+  if(iA>iE){
+    pw.hidden=false;
+    pw.innerHTML = "<strong>"+PROG[DB.set.phase].label+" est active alors que tu es au jour "+jour+" du protocole.</strong> "
+      + "À ce stade, la "+PROG[attendu].label.toLowerCase()+" est la bonne. "
+      + (DB.set.phase==="S3" ? "La semaine 3 contient pliométrie, sprints et frappes — sur un tendon encore réactif, c'est le moyen le plus rapide de repartir à zéro. " : "")
+      + "<button class=\"btn\" id=\"phaseFix\" style=\"margin-top:9px\">Revenir en "+PROG[attendu].label+"</button>";
+    const fx=$("#phaseFix");
+    if(fx) fx.onclick=()=>{ DB.set.phase=attendu; browsePh=attendu; save(); renderToday(); renderWeek(); renderProto(); };
+  } else { pw.hidden=true; }
+
+  const fn = $("#fastNote");
+  if(FASTD.includes(isoDow(T))){
+    fn.hidden=false;
+    fn.innerHTML = "<strong>Jour de jeûne.</strong> Isométrie et chaîne de soutien maintenues — coût métabolique quasi nul. Charge lourde supprimée le matin, reportée à 20 h 30 si tu te sens bien. Rupture en trois temps : eau, dattes et isolate, puis repas complet à +45 min, puis fractionnement de l'eau jusqu'au coucher.";
+  } else { fn.hidden=true; }
+
+  renderVerdict();
+}
+function stat(v,k){ return '<div><div class="v">'+v+'</div><div class="k">'+k+'</div></div>'; }
+
+function renderVerdict(){
+  const v=$("#verdict"), t=day(T).kpi.pain, y=(DB.days[shiftISO(T,-1)]||{kpi:{}}).kpi.pain;
+  v.className="verdict";
+  if(t==null){
+    v.querySelector(".big").textContent="En attente";
+    v.querySelector(".exp").textContent="Renseigne ta douleur du matin dans l'onglet KPI pour obtenir le verdict.";
+    return;
+  }
+  if(y==null){
+    v.querySelector(".big").textContent="Référence posée";
+    v.querySelector(".exp").textContent="Douleur du jour : "+t+"/10. Le verdict apparaît demain, quand il y aura un point de comparaison.";
+    return;
+  }
+  const dl = t-y, sg = dl>0?"+"+dl:String(dl);
+  if(dl<=1){ v.classList.add("ok");
+    v.querySelector(".big").textContent="Charge bien dosée";
+    v.querySelector(".exp").textContent="Douleur "+t+"/10 contre "+y+"/10 hier ("+sg+"). Tu peux progresser d'un palier aujourd'hui si le reste suit.";
+  } else if(dl===2){ v.classList.add("warn");
+    v.querySelector(".big").textContent="Maintiens la charge";
+    v.querySelector(".exp").textContent="Douleur "+t+"/10 contre "+y+"/10 ("+sg+"). Charge identique pendant 48 h, aucune progression.";
+  } else { v.classList.add("bad");
+    v.querySelector(".big").textContent="Recule d'un palier";
+    v.querySelector(".exp").textContent="Douleur "+t+"/10 contre "+y+"/10 ("+sg+"). Reprends le niveau précédent pendant trois jours. La douleur pendant l'effort n'est pas un critère d'arrêt — celle à 24 h, oui.";
+  }
+}
+
+function streak(){
+  let n=0;
+  for(let i=0;i<120;i++){
+    const iso=shiftISO(T,-i), d=DB.days[iso];
+    const ids=planFor(iso).filter(id=>BLOCKS[id]&&BLOCKS[id].k!=="cardio");
+    if(!d||!ids.length) break;
+    const ok=ids.every(id=>d.blocks&&d.blocks[id]);
+    if(ok) n++; else break;
+  }
+  return n;
+}
+
+/* ============================================================
+   5. RENDU — Exercices
+   ============================================================ */
+let exFilt="all";
+function renderEx(){
+  const f=$("#exFilter"); f.innerHTML="";
+  [["all","Tout"],["S1","Semaine 1"],["S2","Semaine 2"],["S3","Semaine 3"],
+   ["iso","Isométrie"],["force","Force"],["soutien","Soutien"],["plyo","Pliométrie"]]
+  .forEach(([k,lab])=>{
+    const b=el("button","pill"+(exFilt===k?" on":""),lab);
+    b.onclick=()=>{exFilt=k;renderEx();};
+    f.appendChild(b);
+  });
+  const list=$("#exList"); list.innerHTML="";
+  Object.entries(EX).forEach(([id,e])=>{
+    if(exFilt!=="all" && !e.ph.includes(exFilt) && e.k!==exFilt) return;
+    const r=el("div","row"); r.dataset.k=e.k;
+    r.appendChild(el("span","bar"));
+    const body=el("div","body");
+    body.appendChild(el("div","name",(e.star?"★ ":"")+e.n));
+    body.appendChild(el("div","sub",e.tag));
+    body.appendChild(el("div","when",e.ph.join(" · ")));
+    r.appendChild(body);
+    if(TMR[id]){
+      const tg=el("button","go","⏱"); tg.type="button"; tg.title="Minuteur";
+      tg.setAttribute("aria-label","Minuteur — "+e.n);
+      tg.onclick=ev=>{ ev.stopPropagation(); openTimer(id); };
+      r.appendChild(tg);
+    }
+    const g=el("button","go","Voir en 3D"); g.type="button";
+    g.onclick=ev=>{ ev.stopPropagation(); openViewer(id); };
+    r.appendChild(g);
+    r.style.cursor="pointer"; r.onclick=()=>openViewer(id);
+    list.appendChild(r);
+  });
+}
+
+/* ============================================================
+   6. RENDU — KPI
+   ============================================================ */
+function zone(v){ return v<=2?"ok":(v<=4?"warn":"bad"); }
+function renderKpi(){
+  const d=day(T), w=week(weekKey(T)), box=$("#kpiFields"); box.innerHTML="";
+  KPIS.forEach(k=>{
+    const f=el("div","field");
+    f.appendChild(el("div","q",k.q));
+    let h=k.h; if(k.base!=null) h+=" Ta référence de départ : "+k.base+(k.unit?" "+k.unit:"/10")+".";
+    f.appendChild(el("div","h",h));
+    if(k.type==="scale"){
+      const s=el("div","scale");
+      for(let i=0;i<=10;i++){
+        const b=el("button",d.kpi[k.id]===i?"on":"",String(i));
+        b.dataset.z=zone(i); b.setAttribute("aria-label",k.q+" : "+i);
+        b.onclick=()=>{ d.kpi[k.id]= d.kpi[k.id]===i?null:i; if(d.kpi[k.id]==null) delete d.kpi[k.id]; save(); renderKpi(); renderToday(); };
+        s.appendChild(b);
+      }
+      f.appendChild(s);
+      f.appendChild(el("div","scalelg","<span>0 — aucune</span><span>4 — plafond toléré</span><span>10 — maximale</span>"));
+    } else {
+      const n=el("div","numin");
+      const i=document.createElement("input");
+      i.type="number"; i.min=0; i.max=k.max||180; i.inputMode="numeric";
+      i.value = d.kpi[k.id]!=null?d.kpi[k.id]:"";
+      i.setAttribute("aria-label",k.q);
+      i.oninput=()=>{ const v=i.value===""?null:Math.max(0,+i.value); if(v==null) delete d.kpi[k.id]; else d.kpi[k.id]=v; save(); renderToday(); };
+      n.appendChild(i); n.appendChild(el("span",null,k.unit||""));
+      f.appendChild(n);
+    }
+    box.appendChild(f);
+  });
+
+  const sp=$("#sparkPain"), lb=$("#sparkPainLab"); sp.innerHTML=""; lb.innerHTML="";
+  for(let i=13;i>=0;i--){
+    const iso=shiftISO(T,-i), v=(DB.days[iso]||{kpi:{}}).kpi.pain;
+    const b=el("div");
+    if(v!=null){
+      b.style.height=Math.max(6,(v/10)*100)+"%";
+      b.style.background="var(--"+zone(v)+")";
+      b.title=iso+" : "+v+"/10";
+    }
+    sp.appendChild(b);
+    lb.appendChild(el("span",null, i%2===0?DOWS[isoDow(iso)][0]:"&nbsp;"));
+  }
+
+  const wb=$("#weeklyFields"); wb.innerHTML="";
+  WKPIS.forEach(k=>{
+    const f=el("div","field");
+    f.appendChild(el("div","q",k.q));
+    f.appendChild(el("div","h",k.h));
+    const n=el("div","numin");
+    const i=document.createElement("input");
+    i.type="number"; i.min=0; i.max=k.max; i.inputMode="numeric";
+    i.value = w[k.id]!=null?w[k.id]:"";
+    i.setAttribute("aria-label",k.q);
+    i.oninput=()=>{ const v=i.value===""?null:+i.value; if(v==null) delete w[k.id]; else w[k.id]=v; save(); renderProto(); };
+    n.appendChild(i); n.appendChild(el("span",null,k.unit));
+    f.appendChild(n);
+    if(k.id==="visa"){
+      const b=el("button","btn ghost", w.visa!=null?"Rouvrir le questionnaire":"Remplir le questionnaire — 8 questions");
+      b.style.marginTop="10px";
+      b.onclick=()=>{ $("#visa").classList.add("on"); renderVisa(); $("#visa .qbody").scrollTop=0; };
+      f.appendChild(b);
+      f.appendChild(el("div","h","Tu n'as pas à le chercher ailleurs : il est intégré ici, le calcul du score est automatique."));
+    }
+    wb.appendChild(f);
+  });
+}
+
+/* ---------- VISA-P : saisie guidée et calcul du score ---------- */
+function visaAns(){ const w=week(weekKey(T)); if(!w.visaA) w.visaA={}; return w.visaA; }
+function visaTotal(){
+  const a=visaAns(); let tot=0, done=0;
+  ["q1","q2","q3","q4","q5","q6"].forEach(k=>{ if(a[k]!=null){ tot+=a[k]; done++; } });
+  if(a.q7!=null){ tot+=a.q7; done++; }
+  if(a.q8!=null && a.q8b){ tot+=a.q8; done++; }
+  return {tot:tot, done:done, complete:done===8};
+}
+function renderVisa(){
+  const box=$("#visaQ"); if(!box) return;
+  const a=visaAns(); box.innerHTML="";
+
+  VISA.forEach((q,qi)=>{
+    const f=el("div","field");
+    f.appendChild(el("div","q",(qi+1)+". "+q.t));
+    f.appendChild(el("div","h",q.h));
+
+    if(q.kind==="scale"){
+      const sc=el("div","scale");
+      for(let i=0;i<=10;i++){
+        const b=el("button",a[q.id]===i?"on":"",String(i));
+        b.dataset.z = i>=8?"ok":(i>=4?"warn":"bad");
+        b.setAttribute("aria-label",q.t+" : "+i);
+        b.onclick=()=>{ a[q.id]= a[q.id]===i?null:i; if(a[q.id]==null) delete a[q.id]; save(); renderVisa(); };
+        sc.appendChild(b);
+      }
+      f.appendChild(sc);
+      f.appendChild(el("div","scalelg","<span>0 — "+q.lo+"</span><span>10 — "+q.hi+"</span>"));
+    }
+
+    if(q.kind==="opts"){
+      const g=el("div","opts");
+      q.o.forEach(([lab,pts])=>{
+        const b=el("button",a[q.id]===pts?"on":"","<b>"+pts+"</b>"+lab);
+        b.onclick=()=>{ a[q.id]= a[q.id]===pts?null:pts; if(a[q.id]==null) delete a[q.id]; save(); renderVisa(); };
+        g.appendChild(b);
+      });
+      f.appendChild(g);
+    }
+
+    if(q.kind==="branch"){
+      const g=el("div","opts");
+      q.b.forEach(br=>{
+        const b=el("button",a.q8b===br.k?"on":"",br.l);
+        b.onclick=()=>{ a.q8b = a.q8b===br.k?null:br.k; delete a.q8; save(); renderVisa(); };
+        g.appendChild(b);
+      });
+      f.appendChild(g);
+      if(a.q8b){
+        const br=q.b.find(x=>x.k===a.q8b);
+        const g2=el("div","opts"); g2.style.marginTop="8px";
+        br.o.forEach(([lab,pts])=>{
+          const b=el("button",a.q8===pts?"on":"","<b>"+pts+"</b>"+lab);
+          b.onclick=()=>{ a.q8= a.q8===pts?null:pts; if(a.q8==null) delete a.q8; save(); renderVisa(); };
+          g2.appendChild(b);
+        });
+        f.appendChild(g2);
+      }
+    }
+    box.appendChild(f);
+  });
+
+  const r=visaTotal();
+  $("#visaNum").textContent = r.complete ? r.tot : (r.done+"/8");
+  $("#visaNum").style.color = r.complete ? (r.tot>=80?"var(--ok)":(r.tot>=55?"var(--warn)":"var(--bad)")) : "var(--txt3)";
+  $("#visaLab").textContent = r.complete
+    ? "Score VISA-P : "+r.tot+" sur 100. Touche Enregistrer pour le verser dans ton bilan de la semaine."
+    : "Score partiel "+r.tot+" — il te reste "+(8-r.done)+" question(s). Le score n'a de sens que complet.";
+
+  const prev=[], wk=weekKey(T);
+  Object.keys(DB.weeks).sort().forEach(k=>{ if(k!==wk && DB.weeks[k].visa!=null) prev.push({k:k,v:DB.weeks[k].visa}); });
+  const last=prev.length?prev[prev.length-1]:null;
+  let txt="<strong>Comment lire ton score.</strong> 100 = tendon asymptomatique. En dessous de 80, la tendinopathie est symptomatique — c'est ta cible de sortie à J21. Une variation n'est cliniquement significative qu'à partir d'environ 13 points : en dessous, c'est du bruit de mesure, ne change rien au protocole pour autant.";
+  if(r.complete && last){
+    const d=r.tot-last.v;
+    txt += " <strong>Par rapport à ton dernier score</strong> ("+last.v+") : "+(d>0?"+"+d:d)+" point(s) — "
+      + (Math.abs(d)>=13 ? (d>0?"progression réelle et significative.":"dégradation significative, à signaler.") : "variation dans le bruit de mesure, pas de conclusion à en tirer.");
+  }
+  txt += " Ce questionnaire est une adaptation française des 8 items de l'instrument original ; si ton kiné utilise la version officielle, garde la sienne pour rester comparable d'une fois sur l'autre.";
+  $("#visaRead").innerHTML = txt;
+}
+
+/* ============================================================
+   7. RENDU — Semaine / assiduité
+   ============================================================ */
+function renderWeek(){
+  const g=$("#weekGrid"); g.innerHTML="";
+  const days=[]; for(let i=6;i>=0;i--) days.push(shiftISO(T,-i));
+  g.appendChild(el("div","hd",""));
+  days.forEach(iso=>g.appendChild(el("div","hd",DOWS[isoDow(iso)])));
+
+  const rows=[["iso","Isométrie"],["force","Force"],["soutien","Soutien"],["plyo","Pliométrie"],["terrain","Terrain"],["cardio","Cardio"]];
+  let done=0,planned=0;
+  rows.forEach(([k,lab])=>{
+    g.appendChild(el("div","rl",lab));
+    days.forEach(iso=>{
+      const ids=planFor(iso).filter(id=>BLOCKS[id]&&BLOCKS[id].k===k);
+      const d=DB.days[iso]||{blocks:{}};
+      if(!ids.length){ g.appendChild(el("div","cell na","")); return; }
+      const n=ids.filter(id=>d.blocks&&d.blocks[id]).length;
+      planned+=ids.length; done+=n;
+      const c=el("div","cell "+(n===ids.length?"d":(n>0?"m":"m")), n+"/"+ids.length);
+      c.title=iso+" — "+lab;
+      g.appendChild(c);
+    });
+  });
+
+  const pct = planned?Math.round(done/planned*100):0;
+  let kpiDays=0, suppPct=0, suppN=0;
+  days.forEach(iso=>{
+    const d=DB.days[iso]; if(!d) return;
+    if(d.kpi&&d.kpi.pain!=null) kpiDays++;
+    const hv=heavyDay(iso), tot=SUPPS.filter(s=>!s.heavyOnly||hv).length;
+    const got=SUPPS.filter(s=>(!s.heavyOnly||hv)&&d.supps&&d.supps[s.id]).length;
+    suppPct+=got/tot; suppN++;
+  });
+  const sp = suppN?Math.round(suppPct/suppN*100):0;
+  $("#weekStat").innerHTML = stat(pct+"%","Blocs réalisés")+stat(kpiDays+"/7","Jours mesurés")+stat(sp+"%","Compléments")+stat(streak()+" j","Série en cours");
+
+  const r=$("#weekRead");
+  let msg="";
+  if(planned===0) msg="<strong>Rien à lire encore.</strong> Coche tes premiers blocs sur l'écran du jour.";
+  else if(pct>=85 && kpiDays>=6) msg="<strong>Assiduité solide.</strong> "+pct+" % des blocs faits et "+kpiDays+" jours mesurés sur 7. C'est exactement le niveau qui fait fonctionner un protocole de charge — la régularité compte plus que l'intensité.";
+  else if(kpiDays<5) msg="<strong>Le trou est dans la mesure, pas dans l'entraînement.</strong> "+kpiDays+" jours mesurés sur 7 : sans la douleur du matin, la règle des 24 h ne peut pas te guider et tu progresses à l'aveugle. C'est deux minutes à 6 h 00.";
+  else if(pct<60) msg="<strong>Assiduité à "+pct+" %.</strong> Un tendon ne répond qu'à une charge régulière. Mieux vaut réduire le volume prévu et tout cocher que viser large et faire la moitié — dis-le à ton coach pour qu'il allège le plan.";
+  else msg="<strong>Assiduité à "+pct+" %.</strong> Correct, mais le Bloc A et le Bloc C sont ceux qu'on ne saute jamais : ce sont eux qui soignent. Les manques sur le cardio pèsent beaucoup moins.";
+  if(sp<70 && suppN>2) msg+=" Côté compléments, "+sp+" % de prises : le collagène à 5 h 00 est le seul dont l'oubli coûte quelque chose, parce que son effet dépend de la fenêtre de 60 min avant la charge.";
+  r.innerHTML=msg;
+}
+
+/* ============================================================
+   8. RENDU — Protocole
+   ============================================================ */
+const PHORDER = ["S1","S2","S3"];
+let browsePh = null;   /* semaine CONSULTÉE — distincte de la semaine ACTIVE */
+
+function renderProto(){
+  const act = DB.set.phase;
+  if(browsePh==null || !PROG[browsePh]) browsePh = act;
+
+  const p=$("#phasePick"); p.innerHTML="";
+  PHORDER.forEach(k=>{
+    const b=el("button","pill"+(browsePh===k?" on":""), PROG[k].label+(k===act?" ✓":""));
+    b.onclick=()=>{ browsePh=k; renderProto(); };   /* consultation seulement */
+    p.appendChild(b);
+  });
+
+  /* Commande d'activation séparée : changer de semaine est une décision, pas un clic de lecture */
+  const sw=$("#phaseSwitch"); sw.innerHTML="";
+  const iAct=PHORDER.indexOf(act), iBr=PHORDER.indexOf(browsePh);
+  if(iBr===iAct){
+    sw.innerHTML='<div class="note ok" style="margin:0"><strong>'+PROG[act].label
+      +'</strong> est ta semaine active. Les cases cochées et les blocs de l\'écran du jour viennent d\'elle.</div>';
+  } else {
+    const pain0=day(T).kpi.pain;
+    const ahead = iBr>iAct;
+    const gateOk = pain0!=null && pain0<=3;
+    const skip = iBr>iAct+1;
+    const b=el("button","btn"+(ahead?"":" ghost"), ahead ? "Passer en "+PROG[browsePh].label : "Revenir en "+PROG[browsePh].label);
+    b.onclick=()=>{
+      if(ahead && b.dataset.c!=="1"){
+        b.dataset.c="1";
+        b.textContent = skip ? "Confirmer le saut de semaine" : (gateOk ? "Confirmer le passage" : "Critère non atteint — confirmer quand même");
+        setTimeout(()=>{ b.dataset.c=""; b.textContent="Passer en "+PROG[browsePh].label; },5000);
+        return;
+      }
+      DB.set.phase=browsePh; save(); renderProto(); renderToday(); renderWeek();
+    };
+    sw.appendChild(b);
+    let msg;
+    if(!ahead) msg="Reculer d'une semaine est toujours possible en un seul geste : alléger la charge ne présente aucun risque.";
+    else if(skip) msg="<strong>Tu sauterais une semaine entière.</strong> La "+PROG[PHORDER[iAct+1]].label+" introduit la charge lourde lente et la course ; la "+PROG[browsePh].label+" ajoute la pliométrie, les sprints et les frappes. Les attaquer sans l'étape intermédiaire est le scénario de rechute le plus courant.";
+    else if(!gateOk) msg="<strong>Le critère de passage n'est pas atteint</strong>"+(pain0!=null?" (douleur "+pain0+"/10, seuil 3)":" — ta douleur du jour n'est pas renseignée")+". Tu peux forcer, mais c'est contre l'avis du protocole.";
+    else msg="Critère de douleur atteint. Vérifie aussi que la douleur à 24 h n'a jamais monté de 2 points après un Bloc B cette semaine.";
+    sw.appendChild(el("div","note"+(ahead&&(skip||!gateOk)?" bad":""),msg));
+  }
+
+  const g=$("#gateNote");
+  const pain=day(T).kpi.pain, w=week(weekKey(T));
+  if(browsePh==="S1"){
+    const ready = pain!=null && pain<=3;
+    g.className="note "+(ready?"ok":"");
+    g.innerHTML = ready
+      ? "<strong>Critère de passage atteint sur la douleur.</strong> "+pain+"/10 au squat déclin, sous le seuil de 3. Vérifie aussi que la douleur à 24 h n'est jamais montée de 2 points après un Bloc B cette semaine, puis passe en S2."
+      : "<strong>Critère de passage en S2 :</strong> douleur au squat déclin à 3/10 ou moins, raideur matinale stable ou réduite, et douleur à 24 h jamais montée de 2 points après un Bloc B."+(pain!=null?" Tu es à "+pain+"/10 aujourd'hui.":"")+" Si tu es encore à 4 ou 5 à J7, prolonge la S1 de cinq à sept jours : ce n'est pas un échec, c'est l'information que ton tendon avait besoin de plus de temps en isométrie.";
+  } else if(browsePh==="S2"){
+    g.className="note";
+    g.innerHTML="<strong>Passage en S3 :</strong> douleur stable sous 3/10 après deux séances de charge lourde lente, course linéaire de 25 min indolore, et aucune réaction à 24 h après le ballon. La pliométrie n'arrive qu'à ces conditions."+(w.visa!=null?" VISA-P actuel : "+w.visa+"/100.":"");
+  } else {
+    g.className="note";
+    g.innerHTML="<strong>Phase finale.</strong> Les cinq tests de sortie sont en bas de cet écran. Cinq sur cinq pour valider l'entraînement club complet."+(w.visa!=null?" VISA-P actuel : "+w.visa+"/100, cible 80.":"");
+  }
+
+  const ph=PROG[browsePh];
+  let h='<table class="grid"><tr><th>Jour</th><th>Contenu</th><th>Contrainte</th></tr>';
+  [1,2,3,4,5,6,0].forEach(dw=>{
+    let ids=(ph.days[dw]||[]).slice();
+    if(FASTD.includes(dw)) ids=ids.concat(ph.fast[dw]||[]);
+    const names=ids.map(i=>BLOCKS[i]?BLOCKS[i].n.replace(/^Bloc [ABC] — /,""):i).join(" · ");
+    const con=FASTD.includes(dw)?"Jeûne — aucune charge lourde le matin":(dw===3?"Club 20 h 30":(dw===0?"Reprise match reportée":"—"));
+    h+='<tr><td><b>'+DOWN[dw].charAt(0).toUpperCase()+DOWN[dw].slice(1)+'</b></td><td>'+names+'</td><td>'+con+'</td></tr>';
+  });
+  h+='</table><div class="note bad" style="margin-left:0;margin-right:0">'+ph.ban+'</div>';
+  $("#protoWeek").innerHTML=h;
+}
+
+/* ============================================================
+   8bis. MINUTEUR — maintiens chronométrés et repos
+   ============================================================ */
+let TM = null, tmrInt = null, tmrSnd = true, tmrLock = null, AC = null;
+
+function beep(f, dur, vol){
+  if(!tmrSnd) return;
+  try{
+    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==="suspended") AC.resume();
+    const o=AC.createOscillator(), g=AC.createGain();
+    o.type="sine"; o.frequency.value=f;
+    g.gain.setValueAtTime(0, AC.currentTime);
+    g.gain.linearRampToValueAtTime(vol||.22, AC.currentTime+.012);
+    g.gain.exponentialRampToValueAtTime(.0001, AC.currentTime+(dur||.13));
+    o.connect(g); g.connect(AC.destination);
+    o.start(); o.stop(AC.currentTime+(dur||.13)+.03);
+  }catch(e){}
+}
+function buzz(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
+
+function tmrSeqBuild(c){
+  const ph=[{k:"prep",d:6}], sides=c.sides||1;
+  for(let i=0;i<c.series;i++){
+    for(let sd=0; sd<sides; sd++){
+      ph.push(c.work ? {k:"work",d:c.work,i:i,sd:sd} : {k:"set",d:0,i:i,sd:sd});
+      const last = (i===c.series-1) && (sd===sides-1);
+      if(!last) ph.push({k:"rest",d:c.rest,i:i,sd:sd});
+    }
+  }
+  ph.push({k:"done",d:0});
+  return ph;
+}
+
+/* Le minuteur a deux surfaces d'affichage : le plein écran, et le bandeau sous
+   la vue 3D. Une seule séance en cours, partagée par les deux. */
+function tmrSetup(exId){
+  const e = EX[exId], c0 = TMR[exId];
+  if(!c0) return false;
+  TM = {id:exId, c:Object.assign({}, c0), ph:[], i:0, t0:0, run:false, el:0, last:-1};
+  TM.ph = tmrSeqBuild(TM.c);
+  if(tmrInt) clearInterval(tmrInt);
+  tmrInt = setInterval(tmrRender, 200);
+  try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").then(l=>tmrLock=l).catch(()=>{}); }catch(e2){}
+  return true;
+}
+
+/* Minuteur dans la fiche 3D : le mouvement reste visible au-dessus pendant la série. */
+function startInlineTimer(exId){
+  if(!tmrSetup(exId)) return;
+  TM.run = true; TM.t0 = Date.now();
+  $("#vTmrBar").hidden = false;
+  const hb=$("#vTimer"); if(hb){ hb.classList.add("live"); hb.textContent="⏱ En cours"; }
+  beep(520,.12);
+  tmrRender();
+}
+function stopInlineTimer(){
+  $("#vTmrBar").hidden = true;
+  const hb=$("#vTimer"); if(hb){ hb.classList.remove("live"); hb.textContent="⏱ Minuteur"; }
+  if(TM && !$("#tmr").classList.contains("on")){
+    TM.run=false;
+    if(tmrInt){ clearInterval(tmrInt); tmrInt=null; }
+    try{ if(tmrLock){ tmrLock.release(); tmrLock=null; } }catch(e){}
+  }
+}
+
+function openTimer(exId){
+  const e = EX[exId];
+  if(!tmrSetup(exId)) return;
+  $("#tmrName").textContent = e ? e.n : "Minuteur";
+  const c=TM.c;
+  $("#tmrSub").textContent = (c.work
+      ? c.series+" × "+c.work+" s · repos "+fmtS(c.rest)
+      : c.series+" × "+c.reps+" reps · repos "+fmtS(c.rest))
+    + ((c.sides||1)>1 ? " · les deux côtés" : "");
+  $("#tmr").classList.add("on");
+  $("#tmr .tbody").scrollTop=0;
+  tmrRender(); tmrCfgRender();
+}
+function closeTimer(){
+  $("#tmr").classList.remove("on");
+  /* si le bandeau de la fiche 3D est ouvert, la séance continue dessous */
+  if(!$("#vTmrBar").hidden) { tmrRender(); return; }
+  if(tmrInt){ clearInterval(tmrInt); tmrInt=null; }
+  if(TM) TM.run=false;
+  try{ if(tmrLock){ tmrLock.release(); tmrLock=null; } }catch(e){}
+}
+function fmtS(sec){
+  sec=Math.max(0,Math.round(sec));
+  return sec>=60 ? Math.floor(sec/60)+" min"+(sec%60?" "+(sec%60)+" s":"") : sec+" s";
+}
+function fmtClock(sec){
+  sec=Math.max(0,sec);
+  const m=Math.floor(sec/60), r=Math.ceil(sec-m*60);
+  return m>0 ? m+":"+String(Math.min(59,r)).padStart(2,"0") : String(r);
+}
+
+function tmrElapsed(){
+  if(!TM) return 0;
+  return TM.run ? TM.el + (Date.now()-TM.t0)/1000 : TM.el;
+}
+function tmrAdvance(){
+  if(!TM) return;
+  TM.i = Math.min(TM.i+1, TM.ph.length-1);
+  TM.el = 0; TM.t0 = Date.now(); TM.last = -1;
+  const k = TM.ph[TM.i].k;
+  if(k==="done"){ TM.run=false; beep(660,.16); setTimeout(()=>beep(880,.26),180); buzz([90,70,90,70,160]); }
+  else if(k==="set"){ TM.run=false; beep(760,.14); buzz(60); }
+  else { beep(k==="work"?880:520,.20); buzz(k==="work"?[70,50,70]:120); }
+  tmrRender();
+}
+
+function tmrRender(){
+  if(!TM) return;
+  const cur = TM.ph[TM.i], c = TM.c, sides=(c.sides||1);
+  const num=$("#tmrNum"), ph=$("#tmrPh"), sr=$("#tmrSr"), ring=$("#tmrRing"), go=$("#tmrGo");
+
+  let rem = 0, frac = 0;
+  if(cur.d>0){
+    rem = cur.d - tmrElapsed();
+    frac = Math.max(0, Math.min(1, rem/cur.d));
+    if(TM.run && rem<=0){ tmrAdvance(); return; }
+    const w = Math.ceil(rem);
+    if(TM.run && w<=3 && w>=1 && w!==TM.last){ TM.last=w; beep(620,.09,.18); buzz(40); }
+  }
+
+  const sideLbl = sides>1 ? (cur.sd===0 ? " · côté gauche" : " · côté droit") : "";
+  const serLbl  = cur.i!=null ? "Série "+(cur.i+1)+" / "+c.series : "";
+
+  if(cur.k==="prep"){
+    num.textContent = fmtClock(rem); ph.textContent="En place"; sr.textContent="Mise en position"+sideLbl;
+    ring.style.stroke="var(--txt3)"; go.textContent = TM.run?"Pause":"Reprendre";
+  } else if(cur.k==="work"){
+    num.textContent = fmtClock(rem); ph.textContent="Maintien";
+    sr.textContent = serLbl+sideLbl; ring.style.stroke="var(--gold)";
+    go.textContent = TM.run?"Pause":"Reprendre";
+  } else if(cur.k==="set"){
+    num.textContent = c.reps; ph.textContent="Répétitions";
+    sr.textContent = serLbl+sideLbl+(c.tempo?" · tempo "+c.tempo[0]+" s"+(c.tempo[1]?" / "+c.tempo[1]+" s":""):"");
+    ring.style.stroke="var(--line2)"; frac=1;
+    go.textContent="Série terminée";
+  } else if(cur.k==="rest"){
+    num.textContent = fmtClock(rem); ph.textContent="Repos";
+    sr.textContent = "Avant série "+Math.min(c.series, (cur.sd===sides-1? cur.i+2 : cur.i+1))+" / "+c.series
+      + (sides>1 ? (cur.sd===0?" · puis côté droit":" · puis côté gauche") : "");
+    ring.style.stroke="var(--ok)"; go.textContent = TM.run?"Pause":"Reprendre";
+  } else {
+    num.textContent="✓"; ph.textContent="Terminé";
+    sr.textContent = c.series+" séries"+(sides>1?" × 2 côtés":"")+" bouclées";
+    ring.style.stroke="var(--ok)"; frac=1; go.textContent="Recommencer";
+  }
+  ring.setAttribute("stroke-dashoffset", String(326.7*(1-frac)));
+
+  /* Report sur le bandeau de la fiche 3D : mêmes valeurs, format compact */
+  const bar=$("#vTmrBar");
+  if(bar && !bar.hidden){
+    $("#vtNum").textContent = num.textContent;
+    $("#vtPh").textContent  = ph.textContent;
+    $("#vtSr").textContent  = sr.textContent || "—";
+    $("#vtPg").style.width  = Math.round(frac*100)+"%";
+    $("#vtPg").style.background = ring.style.stroke;
+    $("#vtNum").style.color = cur.k==="rest" ? "var(--ok)" : (cur.k==="work" ? "var(--gold)" : "var(--txt)");
+    $("#vtGo").textContent  = cur.k==="set" ? "Série OK" : (cur.k==="done" ? "Refaire" : (TM.run?"Pause":"Reprendre"));
+  }
+
+  const sq=$("#tmrSeq"); sq.innerHTML="";
+  TM.ph.forEach((x,j)=>{
+    if(x.k==="prep"||x.k==="done") return;
+    const sp=document.createElement("span");
+    if(j<TM.i) sp.className="d"; else if(j===TM.i) sp.className="c";
+    if(x.k==="rest") sp.style.flex="0 0 8px";
+    sq.appendChild(sp);
+  });
+
+  const n=$("#tmrNote");
+  if(TM.id==="spanish") n.innerHTML="<strong>Pendant le maintien.</strong> Tibias strictement verticaux, contraction forte à environ 70 % de ton maximum, respiration normale. Douleur acceptable 3 à 4 sur 10 — au-delà, réduis l'angle à 45°.";
+  else if(cur.k==="rest") n.innerHTML="<strong>Le repos fait partie de l'exercice.</strong> Ne le raccourcis pas : c'est lui qui permet à la série suivante d'être aussi qualitative que la première. Marche ou reste debout plutôt que de t'asseoir.";
+  else if(c.tempo) n.innerHTML="<strong>Tempo "+c.tempo[0]+" s"+(c.tempo[1]?" / "+c.tempo[1]+" s":"")+".</strong> Compte les secondes à voix basse. La lenteur est le mécanisme actif : c'est le temps sous tension qui remodèle le tendon, pas la charge brute.";
+  else n.innerHTML="<strong>Qualité avant volume.</strong> Si une répétition se dégrade, arrête la série là et note-le dans ton journal.";
+}
+
+function tmrCfgRender(){
+  const box=$("#tmrCfg"); if(!box||!TM) return;
+  const c=TM.c; box.innerHTML="";
+  const line=(lab,val,step,min,max,key,fmt)=>{
+    box.appendChild(el("div","lb",lab));
+    const v=el("div","vv",fmt?fmt(c[key]):c[key]);
+    const dn=el("button",null,"−"), up=el("button",null,"+");
+    const go=d=>{ c[key]=Math.max(min,Math.min(max,c[key]+d*step));
+      TM.ph=tmrSeqBuild(c); TM.i=0; TM.el=0; TM.run=false; TM.last=-1;
+      $("#tmrSub").textContent = (c.work? c.series+" × "+c.work+" s · repos "+fmtS(c.rest)
+        : c.series+" × "+c.reps+" reps · repos "+fmtS(c.rest))+((c.sides||1)>1?" · les deux côtés":"");
+      tmrCfgRender(); tmrRender(); };
+    dn.onclick=()=>go(-1); up.onclick=()=>go(1);
+    box.appendChild(v); box.appendChild(dn); box.appendChild(up);
+  };
+  line("Séries", c.series, 1, 1, 10, "series");
+  if(c.work) line("Durée du maintien", c.work, 5, 10, 120, "work", v=>v+" s");
+  else line("Répétitions", c.reps, 1, 1, 30, "reps");
+  line("Repos", c.rest, 15, 15, 300, "rest", v=>fmtS(v));
+}
+
+/* ============================================================
+   9. MOTEUR 3D
+   ============================================================ */
+let scene, cam, rend, clock, propGrp, curEx=null, playing=true, slow=false;
+let GL_OK = false, RIGS = [], follows = [], hiTendon = [];
+let GUIDE = {}, guidesOn = true, seeking = false, primaryKey = "knee", primaryRange = 1;
+let TRAILS = [], STRIP = [];
+let yaw=Math.PI/2, pitch=0.10, dist=2.9, dragging=false, lastX=0, lastY=0, pinch=0;
+const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const D2R = Math.PI/180;
+
+/* ---------- Palette anatomique : muscle, tendon, os ---------- */
+const PAL = {mus:0xC27C70, musL:0xD1918A, musD:0x9D5B52, ten:0xEDE6D7, bone:0xF1EADB, hi:0xE8B04B, prop:0x323D47};
+
+function phong(c, sh, sp){ return new THREE.MeshPhongMaterial({color:c, shininess:sh||24, specular:sp||0x70483F}); }
+function makeMats(mirror){
+  const w = m => { if(mirror){ m.transparent=true; m.opacity=.17; m.depthWrite=false; m.side=THREE.DoubleSide; m.shininess=6; } return m; };
+  return {
+    mus:  w(phong(PAL.mus, 22)),
+    musL: w(phong(0xD1918A, 30)),
+    musD: w(phong(PAL.musD, 16)),
+    ten:  w(phong(PAL.ten, 68, 0xFFFFFF)),
+    bone: w(phong(PAL.bone, 46, 0xFFFFFF)),
+    hi:   w(phong(PAL.hi, 78, 0xFFF2CC))
+  };
+}
+
+/* ---------- Primitives de volume ---------- */
+function spindle(len, rTop, rMid, rBot, midAt){
+  const pts=[], N=14, m=(midAt==null?.40:midAt);
+  for(let i=0;i<=N;i++){
+    const t=i/N; let r;
+    if(t<m) r = rTop + (rMid-rTop)*Math.sin((t/m)*Math.PI/2);
+    else    r = rMid + (rBot-rMid)*Math.sin(((t-m)/(1-m))*Math.PI/2);
+    pts.push(new THREE.Vector2(Math.max(.005,r), -t*len));
+  }
+  return new THREE.LatheGeometry(pts, 22);
+}
+function blob(rx,ry,rz,m,x,y,z,rot){
+  const o=new THREE.Mesh(new THREE.SphereGeometry(1,16,12), m);
+  o.scale.set(rx,ry,rz); o.position.set(x||0,y||0,z||0);
+  if(rot) o.rotation.set(rot[0]*D2R,rot[1]*D2R,rot[2]*D2R);
+  return o;
+}
+function cord(len, r1, r2, m, x, y, z, rot){
+  const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,len,10), m);
+  o.position.set(x||0,y||0,z||0);
+  if(rot) o.rotation.set(rot[0]*D2R,rot[1]*D2R,rot[2]*D2R);
+  return o;
+}
+
+/* ---------- Construction d'une figure anatomique ---------- */
+function makeFigure(mirror){
+  const M = makeMats(mirror), J = {}, root = new THREE.Group();
+
+  /* Une sphère à chaque articulation : sans elle, deux troncs de cône qui se
+     rencontrent à 60° laissent une fente ouverte au genou et à la hanche.
+     C'était le défaut le plus visible de la version précédente. */
+  const joint = (r,m,x,y,z)=>{
+    const o=new THREE.Mesh(new THREE.SphereGeometry(r,16,12), m);
+    o.position.set(x||0,y||0,z||0); return o;
+  };
+
+  /* --- Ceinture pelvienne --- */
+  root.add(blob(.118,.082,.090, M.musD, 0,-.015,0));
+  root.add(blob(.086,.082,.072, M.mus, -.070,-.045,-.070));   // fessiers
+  root.add(blob(.086,.082,.072, M.mus,  .070,-.045,-.070));
+
+  /* --- Tronc : lathe orienté VERS LE HAUT (le bug corrigé) --- */
+  const torso = new THREE.Group(); root.add(torso); J.torso = torso;
+  const trunk = new THREE.Mesh(spindle(L.torso,.118,.102,.144,.44), M.mus);
+  trunk.rotation.x = Math.PI;                 // retourne le volume : pelvis en bas, épaules en haut
+  torso.add(trunk);
+  torso.add(blob(.138,.150,.098, M.mus,  0,.360,.004));        // cage thoracique
+  torso.add(blob(.086,.050,.042, M.musL, -.066,.440,.052));    // pectoraux
+  torso.add(blob(.086,.050,.042, M.musL,  .066,.440,.052));
+  torso.add(blob(.070,.112,.048, M.musD, -.098,.340,-.044));   // grand dorsal
+  torso.add(blob(.070,.112,.048, M.musD,  .098,.340,-.044));
+  torso.add(blob(.048,.034,.028, M.musL, -.036,.150,.074));    // grand droit, encastré
+  torso.add(blob(.048,.034,.028, M.musL,  .036,.150,.074));
+  torso.add(blob(.044,.030,.026, M.musL, -.034,.232,.072));
+  torso.add(blob(.044,.030,.026, M.musL,  .034,.232,.072));
+  torso.add(cord(.22,.005,.005, M.ten, 0,.200,.086));          // ligne blanche
+  torso.add(blob(.062,.044,.054, M.musD, -.076,.492,-.014));   // trapèzes
+  torso.add(blob(.062,.044,.054, M.musD,  .076,.492,-.014));
+  torso.add(cord(.080,.044,.050, M.mus, 0,.552,-.004));        // cou
+  torso.add(blob(.098,.116,.108, M.bone, 0,.666,.006));        // tête
+  torso.add(blob(.058,.046,.052, M.mus, 0,.618,.058));         // maxillaire, intégré au crâne
+
+  ["L","R"].forEach(s=>{
+    const sx = (s==="L" ? -1 : 1), inn = -sx;
+
+    /* --- Épaule, bras, avant-bras --- */
+    const up = new THREE.Group(); up.position.set(sx*.166, L.torso-.058, 0); torso.add(up); J["arm"+s]=up;
+    up.add(blob(.056,.058,.052, M.musL, 0,.008,0));            // deltoïde, recouvre l'articulation
+    up.add(new THREE.Mesh(spindle(L.uarm,.048,.054,.036,.30), M.mus));
+    up.add(blob(.032,.078,.028, M.musL, 0,-.100,.026));        // biceps
+    up.add(blob(.030,.086,.026, M.musD, 0,-.112,-.028));       // triceps
+    const fo = new THREE.Group(); fo.position.y=-L.uarm; up.add(fo); J["elb"+s]=fo;
+    fo.add(joint(.042, M.mus));                                 // coude
+    fo.add(new THREE.Mesh(spindle(L.farm,.042,.048,.024,.22), M.mus));
+    fo.add(blob(.034,.064,.030, M.musL, 0,-.058,.016));
+    fo.add(blob(.030,.040,.024, M.bone, 0,-L.farm-.020,.010)); // main
+
+    /* --- Cuisse --- */
+    const th = new THREE.Group(); th.position.set(sx*.084,-.046,0); root.add(th); J["hip"+s]=th;
+    th.add(joint(.080, M.mus));                                 // hanche
+    th.add(new THREE.Mesh(spindle(L.thigh,.082,.094,.052,.36), M.mus));
+    th.add(blob(.058,.148,.046, M.musL, 0,-.160,.038));        // quadriceps
+    th.add(blob(.052,.138,.040, M.musD, 0,-.150,-.044));       // ischio-jambiers
+    th.add(blob(.036,.122,.042, M.musD, inn*.042,-.136,-.002));// adducteurs
+    th.add(cord(.080,.015,.010, M.ten, 0,-.318,.056));         // tendon quadricipital
+    th.add(blob(.032,.032,.018, M.bone, 0,-.398,.058));        // rotule
+    const ptMat = (s==="L") ? M.hi.clone() : M.ten;
+    const pt = cord(.070,.016,.012, ptMat, 0,-.446,.056);      // tendon rotulien
+    th.add(pt);
+    if(s==="L") hiTendon.push(pt);
+
+    /* --- Jambe --- */
+    const sh = new THREE.Group(); sh.position.y=-L.thigh; th.add(sh); J["knee"+s]=sh;
+    sh.add(joint(.058, M.mus));                                 // genou : comble la fente en flexion
+    sh.add(new THREE.Mesh(spindle(L.shin,.056,.070,.030,.20), M.mus));
+    sh.add(blob(.050,.118,.044, M.musL, 0,-.098,-.026));       // jumeaux
+    sh.add(blob(.032,.110,.028, M.musD, 0,-.090,.034));        // tibial antérieur
+    sh.add(blob(.038,.068,.032, M.musD, 0,-.178,-.020));       // soléaire
+    sh.add(cord(.098,.011,.014, M.ten, 0,-.330,-.024));        // tendon d'Achille
+
+    /* --- Pied --- */
+    const ft = new THREE.Group(); ft.position.y=-L.shin; sh.add(ft); J["ank"+s]=ft;
+    ft.add(joint(.042, M.mus));                                 // cheville
+    ft.add(blob(.038,.028,.078, M.mus, 0,-.030,.058));
+    ft.add(blob(.034,.016,.026, M.bone, 0,-.036,.132));
+  });
+
+  return {root:root, J:J};
+}
+
+/* ---------- Décor : fond et sol ---------- */
+function gradientTex(stops, w, h, radial){
+  const c=document.createElement("canvas"); c.width=w; c.height=h;
+  const x=c.getContext("2d");
+  const g = radial ? x.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2) : x.createLinearGradient(0,0,0,h);
+  stops.forEach(([o,col])=>g.addColorStop(o,col));
+  x.fillStyle=g; x.fillRect(0,0,w,h);
+  return new THREE.CanvasTexture(c);
+}
+
+/* ---------- Accessoires ---------- */
+const PROPGEO = {
+  kneebar:()=>[new THREE.CylinderGeometry(.021,.021,.46,12),"hi",[0,0,90]],
+  cable: ()=>[new THREE.CylinderGeometry(.012,.012,1,8),"hi",null],
+  post:  ()=>[new THREE.BoxGeometry(.085,1.15,.085),"prop",null],
+  base:  ()=>[new THREE.BoxGeometry(.34,.055,.42),"prop",null],
+  wall:  ()=>[new THREE.BoxGeometry(1.5,2.1,.07),"prop",null],
+  plate: ()=>[new THREE.BoxGeometry(.80,.055,.50),"prop",null],
+  seat:  ()=>[new THREE.BoxGeometry(.40,.085,.46),"prop",null],
+  back:  ()=>[new THREE.BoxGeometry(.40,.52,.075),"prop",null],
+  roll:  ()=>[new THREE.CylinderGeometry(.050,.050,.26,12),"hi",[0,0,90]],
+  bar:   ()=>[new THREE.CylinderGeometry(.025,.025,1.18,10),"hi",[0,0,90]],
+  disc:  ()=>[new THREE.CylinderGeometry(.185,.185,.042,20),"prop",[0,0,90]],
+  box:   ()=>[new THREE.BoxGeometry(.52,.42,.42),"prop",null],
+  bench: ()=>[new THREE.BoxGeometry(.44,.095,.52),"prop",null],
+  step:  ()=>[new THREE.BoxGeometry(.48,.125,.17),"prop",null],
+  board: ()=>[new THREE.BoxGeometry(.54,.045,.64),"prop",null],
+  mat:   ()=>[new THREE.BoxGeometry(.64,.045,.74),"prop",null],
+  strap: ()=>[new THREE.BoxGeometry(.28,.045,.095),"hi",null],
+  line:  ()=>[new THREE.BoxGeometry(.012,.004,4.2),"prop",null]
+};
+const PROPMAT = {};
+
+function buildProps(list){
+  follows = [];
+  while(propGrp.children.length) propGrp.remove(propGrp.children[0]);
+  (list||[]).forEach(d=>{
+    const def = PROPGEO[d.t]; if(!def) return;
+    const [geo, mk, baseRot] = def();
+    const m = new THREE.Mesh(geo, PROPMAT[mk]);
+    if(baseRot) m.rotation.set(baseRot[0]*D2R, baseRot[1]*D2R, baseRot[2]*D2R);
+    if(d.r) m.rotation.set((d.r[0]||0)*D2R,(d.r[1]||0)*D2R,(d.r[2]||0)*D2R);
+    const o = d.o||[0,0,0];
+    m.position.set(o[0],o[1],o[2]);
+    propGrp.add(m);
+    if(d.span) follows.push({m:m, f:d.f, o:o, from:d.span});
+    else if(d.f) follows.push({m:m, f:d.f, o:o, q:d.q, lockY:d.lockY});
+  });
+}
+const UPV = new THREE.Vector3(0,1,0);
+
+/* Trajectoires : le trajet du bassin et celui du genou pendant tout le cycle.
+   Sur le Spanish squat le genou se réduit à un point — c'est la démonstration
+   que ce sont les hanches qui reculent, pas le genou qui avance. */
+function buildTrails(ex){
+  TRAILS.forEach(o=>scene.remove(o)); TRAILS=[];
+  const rig=RIGS[0], dur=ex.anim[ex.anim.length-1].t, N=72;
+  const pts={pelvis:[], knee:[]}, v=new THREE.Vector3();
+  for(let i=0;i<=N;i++){
+    poseRig(rig, ex, samplePose(ex.anim, (i/N)*dur));
+    rig.root.getWorldPosition(v);   pts.pelvis.push(v.clone());
+    rig.J.kneeL.getWorldPosition(v); pts.knee.push(v.clone());
+  }
+  const mk=(arr,col,op,w)=>{
+    const span = Math.max(...arr.map(a=>a.distanceTo(arr[0])));
+    if(span < .035) return null;           // pas de trace si le point ne se déplace pas
+    const g=new THREE.BufferGeometry().setFromPoints(arr);
+    return new THREE.Line(g, new THREE.LineBasicMaterial({color:col,transparent:true,opacity:op,linewidth:w}));
+  };
+  const a=mk(pts.pelvis,0xFFFFFF,.42,1), b=mk(pts.knee,PAL.hi,.75,1);
+  [a,b].forEach(o=>{ if(o){ o.visible=guidesOn; scene.add(o); TRAILS.push(o); } });
+}
+function updateGuides(){
+  if(!GUIDE.vert) return;
+  const on = guidesOn && !!curEx;
+  GUIDE.vert.visible=on; GUIDE.tib.visible=on; GUIDE.mark.visible=on; GUIDE.arc.visible=on;
+  TRAILS.forEach(o=>o.visible=on);
+
+  /* les ombres de contact restent visibles même repères masqués : c'est un repère
+     de profondeur, pas une mesure */
+  const rig0=RIGS[0], pv=new THREE.Vector3();
+  [["ankL","shL"],["ankR","shR"]].forEach(([j,sh])=>{
+    const o=GUIDE[sh]; o.visible=!!curEx;
+    if(!curEx) return;
+    rig0.J[j].getWorldPosition(pv);
+    const h2=Math.max(0, pv.y-.02), f=Math.max(.35, 1-h2*1.5);
+    o.position.set(pv.x, .005, pv.z+.03);
+    o.scale.set(f,1,1.7*f);
+    o.material.opacity = .42*f;
+  });
+
+  if(!on) return;
+  const rig=RIGS[0], a=new THREE.Vector3(), k=new THREE.Vector3(), q=new THREE.Quaternion();
+  rig.J.ankL.getWorldPosition(a); rig.J.kneeL.getWorldPosition(k);
+
+  /* verticale vraie, posée au sol sous la cheville */
+  const hv = Math.max(.25, k.y + .14);
+  GUIDE.vert.position.set(a.x, hv/2, a.z); GUIDE.vert.scale.set(1,hv,1);
+  GUIDE.vert.quaternion.identity();
+
+  /* axe du tibia, prolongé jusqu'au sol */
+  rig.J.kneeL.getWorldQuaternion(q);
+  const dir = new THREE.Vector3(0,-1,0).applyQuaternion(q).normalize();
+  const len = dir.y < -.05 ? Math.min(1.1, k.y/(-dir.y)) : .50;
+  GUIDE.tib.position.copy(k).addScaledVector(dir, len/2);
+  GUIDE.tib.quaternion.setFromUnitVectors(UPV, dir);
+  GUIDE.tib.scale.set(1,len,1);
+
+  GUIDE.mark.position.set(a.x, .006, a.z);
+
+  /* arc du genou : du fémur vers le tibia, rayon 9 cm */
+  const hp=new THREE.Vector3(); rig.J.hipL.getWorldPosition(hp);
+  const u1=hp.clone().sub(k).normalize(), u2=a.clone().sub(k).normalize();
+  const pos=GUIDE.arc.geometry.attributes.position, N=GUIDE.arcN, tmp=new THREE.Vector3();
+  for(let i=0;i<=N;i++){
+    const u=i/N;
+    tmp.copy(u1).multiplyScalar(1-u).addScaledVector(u2,u);
+    if(tmp.lengthSq()<1e-6) tmp.copy(u1);
+    tmp.normalize().multiplyScalar(.092).add(k);
+    pos.setXYZ(i, tmp.x, tmp.y, tmp.z);
+  }
+  pos.needsUpdate=true;
+  GUIDE.arc.geometry.computeBoundingSphere();
+}
+function updateFollows(){
+  const rig = RIGS[0]; if(!rig) return;
+  const v = new THREE.Vector3(), q = new THREE.Quaternion();
+  follows.forEach(fl=>{
+    const j = rig.J[fl.f]; if(!j) return;
+    j.getWorldPosition(v);
+    if(fl.from){
+      const to = new THREE.Vector3(v.x+fl.o[0], v.y+fl.o[1], v.z+fl.o[2]);
+      const fr = new THREE.Vector3(fl.from[0], fl.from[1], fl.from[2]);
+      const dir = to.clone().sub(fr), len = Math.max(.02, dir.length());
+      fl.m.position.copy(fr).addScaledVector(dir, .5);
+      fl.m.quaternion.setFromUnitVectors(UPV, dir.normalize());
+      fl.m.scale.set(1, len, 1);
+      return;
+    }
+    fl.m.position.set(v.x+fl.o[0], (fl.lockY!=null?fl.lockY:v.y+fl.o[1]), v.z+fl.o[2]);
+    if(fl.q && rig.J[fl.q]){ rig.J[fl.q].getWorldQuaternion(q); fl.m.quaternion.copy(q); }
+  });
+}
+
+/* ---------- Initialisation ---------- */
+function initGL(){
+  const can=$("#can"), wrap=$("#canwrap");
+  rend = new THREE.WebGLRenderer({canvas:can, antialias:true, preserveDrawingBuffer:true});
+  rend.setPixelRatio(Math.min(devicePixelRatio||1, 2));
+  scene = new THREE.Scene();
+  scene.background = gradientTex([[0,"#243039"],[.55,"#161E26"],[1,"#090D11"]], 8, 256, false);
+  cam = new THREE.PerspectiveCamera(40,1,.1,60);
+
+  scene.add(new THREE.AmbientLight(0x3A4A57, 1.00));
+  const key=new THREE.DirectionalLight(0xFFF4E4, 1.30); key.position.set(2.3,3.3,2.5); scene.add(key);
+  const rim=new THREE.DirectionalLight(0x93B9E6, .60); rim.position.set(-2.7,1.5,-2.3); scene.add(rim);
+  const fill=new THREE.PointLight(0xFFD7AE, .30, 9); fill.position.set(.6,1.1,1.9); scene.add(fill);
+  /* contre-jour : dessine un liseré clair sur le contour du corps et le détache du fond */
+  const back=new THREE.DirectionalLight(0xC8DEFF, .70); back.position.set(-.4,1.8,-3.4); scene.add(back);
+
+  const floorTex = gradientTex([[0,"#2A3742"],[.42,"#141C24"],[1,"#080C10"]], 256, 256, true);
+  const floor=new THREE.Mesh(new THREE.CircleGeometry(3.2,48),
+    new THREE.MeshPhongMaterial({map:floorTex, shininess:90, specular:0x4A5A6A}));
+  floor.rotation.x=-Math.PI/2; scene.add(floor);
+
+  ["prop","hi"].forEach(k=>{
+    PROPMAT[k] = (k==="hi")
+      ? new THREE.MeshPhongMaterial({color:PAL.hi, shininess:70, specular:0xFFF0C8})
+      : new THREE.MeshPhongMaterial({color:PAL.prop, shininess:38, specular:0x6E7E8C});
+  });
+
+  const main = makeFigure(false); scene.add(main.root); RIGS.push(main);
+  const refWrap = new THREE.Group(); refWrap.scale.set(1,-1,1); scene.add(refWrap);
+  const refl = makeFigure(true); refWrap.add(refl.root); RIGS.push(refl);
+
+  propGrp = new THREE.Group(); scene.add(propGrp);
+
+  /* Repères de lecture : une verticale vraie au sol et l'axe réel du tibia.
+     L'écart entre les deux EST l'angle du tibia — le point technique de tout le protocole. */
+  const gm = new THREE.MeshBasicMaterial({color:0xFFFFFF, transparent:true, opacity:.30});
+  const gg = new THREE.MeshBasicMaterial({color:PAL.hi, transparent:true, opacity:.80});
+  GUIDE.vert = new THREE.Mesh(new THREE.CylinderGeometry(.005,.005,1,6), gm);
+  GUIDE.tib  = new THREE.Mesh(new THREE.CylinderGeometry(.007,.007,1,6), gg);
+  GUIDE.mark = new THREE.Mesh(new THREE.RingGeometry(.085,.105,24), gg);
+  GUIDE.mark.rotation.x = -Math.PI/2;
+
+  /* arc d'angle au genou : tracé entre l'axe du fémur et celui du tibia.
+     C'est la mesure que ferait un goniomètre, affichée en continu. */
+  const AN=20, ab=new THREE.BufferGeometry();
+  ab.setAttribute("position", new THREE.BufferAttribute(new Float32Array((AN+1)*3),3));
+  GUIDE.arc = new THREE.Line(ab, new THREE.LineBasicMaterial({color:PAL.hi,transparent:true,opacity:.95}));
+  GUIDE.arcN = AN;
+
+  [GUIDE.vert,GUIDE.tib,GUIDE.mark,GUIDE.arc].forEach(o=>{o.visible=false;scene.add(o);});
+
+  /* ombres de contact : indispensables pour voir si un pied touche le sol ou non */
+  const sm=new THREE.MeshBasicMaterial({color:0x000000, transparent:true, opacity:.42});
+  GUIDE.shL = new THREE.Mesh(new THREE.CircleGeometry(.085,20), sm);
+  GUIDE.shR = new THREE.Mesh(new THREE.CircleGeometry(.085,20), sm);
+  [GUIDE.shL,GUIDE.shR].forEach(o=>{o.rotation.x=-Math.PI/2;o.scale.set(1,1,1.7);o.visible=false;scene.add(o);});
+
+  clock = new THREE.Clock();
+
+  function resize(){
+    const w = wrap.clientWidth;
+    const h = Math.max(250, Math.min(Math.round(w*0.95), Math.round(innerHeight*0.46)));
+    rend.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix();
+  }
+  resize(); addEventListener("resize",resize);
+
+  wrap.addEventListener("pointerdown",e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;wrap.setPointerCapture(e.pointerId);});
+  wrap.addEventListener("pointermove",e=>{
+    if(!dragging)return;
+    yaw += (e.clientX-lastX)*.0085;
+    pitch = Math.max(-.30,Math.min(.85, pitch + (e.clientY-lastY)*.006));
+    lastX=e.clientX;lastY=e.clientY;
+  });
+  wrap.addEventListener("pointerup",()=>dragging=false);
+  wrap.addEventListener("pointercancel",()=>dragging=false);
+  wrap.addEventListener("wheel",e=>{e.preventDefault();dist=Math.max(1.4,Math.min(6,dist+e.deltaY*.0025));},{passive:false});
+  wrap.addEventListener("touchstart",e=>{ if(e.touches.length===2) pinch=tdist(e); },{passive:true});
+  wrap.addEventListener("touchmove",e=>{
+    if(e.touches.length===2 && pinch){ const d=tdist(e); dist=Math.max(1.4,Math.min(6,dist*(pinch/d))); pinch=d; }
+  },{passive:true});
+  function tdist(e){ const a=e.touches[0],b=e.touches[1]; return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY); }
+
+  tick();
+}
+
+/* ---------- Échantillonnage de l'animation ---------- */
+const ease = t => t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+function samplePose(anim, time){
+  const dur = anim[anim.length-1].t;
+  const t = ((time % dur)+dur)%dur;
+  let i=0; while(i<anim.length-1 && anim[i+1].t<=t) i++;
+  const a=anim[i], b=anim[Math.min(i+1,anim.length-1)];
+  const span=(b.t-a.t)||1, f=ease(Math.max(0,Math.min(1,(t-a.t)/span)));
+  const out={};
+  const keys=new Set([...Object.keys(a.p),...Object.keys(b.p)]);
+  keys.forEach(k=>{ const va=a.p[k]||0, vb=(b.p[k]!=null?b.p[k]:va); out[k]=va+(vb-va)*f; });
+  out.lift = (a.lift||0)+(((b.lift||0)-(a.lift||0))*f);
+  out.pz   = (a.pz||0)+(((b.pz||0)-(a.pz||0))*f);
+  return out;
+}
+
+/* ---------- Application de la pose ---------- */
+function legZ(hip,knee){ return L.thigh*Math.sin(hip*D2R) + L.shin*Math.sin((hip+knee)*D2R); }
+
+function poseRig(rig, ex, p){
+  const r = ex.root||{};
+  {
+    const J = rig.J;
+    J.torso.rotation.set((p.torso||0)*D2R,0,0);
+    ["L","R"].forEach(s=>{
+      let hip=(p.hip||0), knee=(p.knee||0), ank=(p.ank||0);
+      if(s==="R"){
+        if(p.freeHip !=null) hip =p.freeHip;
+        if(p.freeKnee!=null) knee=p.freeKnee;
+        if(p.freeAnk !=null) ank =p.freeAnk;
+      }
+      /* abd positif = ABDUCTION réelle (la jambe s'écarte de la ligne médiane) */
+      J["hip"+s].rotation.set(hip*D2R, 0, (p.abd!=null && s==="R") ? p.abd*D2R : 0);
+      J["knee"+s].rotation.set(knee*D2R,0,0);
+      J["ank"+s].rotation.set(ank*D2R,0,0);
+      /* armZ = bras d'appui (côté gauche), armZ2 = bras libre (côté droit) */
+      const az = (s==="L" ? (p.armZ||0) : (p.armZ2||0));
+      J["arm"+s].rotation.set((p.arm||0)*D2R, 0, az*D2R + (s==="L"?.10:-.10));
+      /* elb positif = FLEXION du coude. Le signe est inversé ici : une rotation X
+         positive du segment le ferait partir en arrière, soit une hyperextension. */
+      J["elb"+s].rotation.set(-(p.elb||0)*D2R,0,0);
+    });
+    /* prx : bascule du corps entier autour d'un appui fixe (Nordic : pivot au genou) */
+    rig.root.rotation.set(((r.rotX||0)+(p.prx||0))*D2R, (r.rotY||0)*D2R, (r.rotZ||0)*D2R);
+    if(r.y!=null) rig.root.position.set(0, r.y+(p.lift||0), (r.z||0)+(p.pz||0));
+    else rig.root.position.set(0, legY(p.hip||0,p.knee||0)+(p.lift||0), legZ(p.hip||0,p.knee||0));
+  }
+}
+
+function applyPose(ex, p){
+  RIGS.forEach(rig=>poseRig(rig, ex, p));
+
+  /* Le tendon rotulien gauche s'éclaire avec la flexion : repère visuel de la charge */
+  const load = Math.min(1, Math.abs(p.knee||0)/70);
+  hiTendon.forEach(t=>{ if(t.material && t.material.emissive) t.material.emissive.setRGB(load*.42, load*.26, 0); });
+
+  const kneeDeg = Math.round(Math.abs(p.knee||0));
+  const tib = Math.round((p.hip||0)+(p.knee||0));
+  $("#angle").textContent = "genou " + kneeDeg + "° · tibia "
+    + (Math.abs(tib)<4 ? "vertical" : (tib>0 ? tib+"° avant" : Math.abs(tib)+"° arrière"));
+}
+
+let tAcc=0;
+function tick(){
+  requestAnimationFrame(tick);
+  const dt = clock?clock.getDelta():0;
+  /* Synchronisation : pendant un maintien, la figure se FIGE sur la position tenue ;
+     pendant une série comptée, elle tourne au tempo prescrit et sert de métronome. */
+  let pace = slow ? .32 : 1;
+  if(curEx && TM && TM.id===curId && !$("#vTmrBar").hidden){
+    const k = TM.ph[TM.i].k, dur = curEx.anim[curEx.anim.length-1].t;
+    if(k==="work"){ tAcc = curEx._tPeak||0; pace = 0; }
+    else if(k==="prep" || k==="done"){ tAcc = 0; pace = 0; }
+    else if(k==="set" && TM.c.tempo){
+      const tt = (TM.c.tempo[0]||0)+(TM.c.tempo[1]||0);
+      if(tt>0) pace = dur/tt;
+    }
+  }
+  if(curEx && playing && pace>0) tAcc += dt*pace;
+  if(curEx){
+    try{
+      applyPose(curEx, samplePose(curEx.anim, tAcc));
+      updateFollows(); updateGuides(); updatePhase();
+    }
+    catch(err){ curEx=null; }
+  }
+  const cy = (curEx && curEx.look!=null) ? curEx.look : 0.74;
+  cam.position.set(Math.sin(yaw)*Math.cos(pitch)*dist, cy+Math.sin(pitch)*dist, Math.cos(yaw)*Math.cos(pitch)*dist);
+  cam.lookAt(0,cy,0);
+  rend.render(scene,cam);
+}
+
+/* Nomme la phase en cours à partir du sens de variation de l'articulation
+   qui travaille le plus dans cet exercice, et chiffre l'amplitude atteinte. */
+function kfVal(f,k){ return k==="lift" ? (f.lift||0)*200 : (f.p[k]||0); }
+function pVal(p,k){ return k==="lift" ? (p.lift||0)*200 : (p[k]||0); }
+function pickPrimary(ex){
+  if(ex.drive){ primaryKey=ex.drive; }
+  else{
+    const keys=["knee","ank","torso","hip","abd","prx","lift"]; let best="knee", span=-1;
+    keys.forEach(k=>{
+      const v=ex.anim.map(f=>kfVal(f,k)), r=Math.max(...v)-Math.min(...v);
+      if(r>span){ span=r; best=k; }
+    });
+    primaryKey=best;
+  }
+  const v=ex.anim.map(f=>kfVal(f,primaryKey));
+  primaryRange=(Math.max(...v)-Math.min(...v))||1;
+
+  /* instant où l'articulation motrice atteint son maximum : c'est la position tenue */
+  let tp=ex.anim[0].t, pk=-1;
+  ex.anim.forEach(f=>{ const a=Math.abs(kfVal(f,primaryKey)); if(a>pk+1e-6){ pk=a; tp=f.t; } });
+  ex._tPeak = tp;
+}
+const PHASE_WORDS = {
+  knee:["Mise en tension","Maintien de la position","Retour contrôlé"],
+  ank: ["Poussée sur l'avant-pied","Position haute tenue","Descente en étirement"],
+  torso:["Descente excentrique","Point limite tenu","Retour"],
+  hip: ["Montée du bassin","Verrouillage haut","Descente contrôlée"],
+  abd: ["Élévation de la jambe","Maintien en appui","Retour"],
+  prx: ["Descente excentrique","Point limite tenu","Retour assisté"]
+};
+function updatePhase(){
+  const box=$("#phase"); if(!box) return;
+  const dur=curEx.anim[curEx.anim.length-1].t;
+  const a=samplePose(curEx.anim, tAcc), b=samplePose(curEx.anim, tAcc+Math.min(.12,dur*.02));
+  const va=pVal(a,primaryKey), vb=pVal(b,primaryKey), d=vb-va;
+  let lbl;
+  if(curEx.segs){
+    /* Enchaînements rapides : le libellé suit le découpage temporel, pas le sens de variation,
+       sinon il clignote à chaque appui. */
+    const t=tAcc%dur; let cur=curEx.segs[0].l;
+    curEx.segs.forEach(sg=>{ if(t>=sg.t) cur=sg.l; });
+    lbl=cur;
+  } else {
+    const w=curEx.phz||PHASE_WORDS[primaryKey]||PHASE_WORDS.knee;
+    lbl = Math.abs(d) < primaryRange*.012 ? w[1] : (Math.abs(vb)>Math.abs(va) ? w[0] : w[2]);
+  }
+  const vals=curEx.anim.map(f=>kfVal(f,primaryKey));
+  const lo=Math.min(...vals), hi=Math.max(...vals);
+  const pct = Math.round(((va-lo)/((hi-lo)||1))*100);
+  const syncTag = (TM && TM.id===curId && !$("#vTmrBar").hidden)
+    ? (TM.ph[TM.i].k==="work" ? " — position tenue"
+      : (TM.ph[TM.i].k==="set" && TM.c.tempo ? " — au tempo" : ""))
+    : "";
+  box.querySelector("b").textContent = lbl + syncTag;
+  box.querySelector("i").textContent = "amplitude " + Math.abs(Math.round(pct)) + " %"
+    + (slow ? " · ralenti" : "") + (playing ? "" : " · en pause");
+  if(!seeking){ const sk=$("#vSeek"); if(sk) sk.value = Math.round((tAcc % dur)/dur*1000); }
+  if(STRIPT.length){
+    const t=tAcc%dur; let near=0, best=1e9;
+    STRIPT.forEach((tt,i)=>{ const d2=Math.abs(tt-t); if(d2<best){best=d2;near=i;} });
+    if(best<.30) markStrip(near); else markStrip(-1);
+  }
+}
+
+/* Décomposition : chaque position clé est rendue en image fixe et posée côte à côte.
+   Une suite d'images arrêtées se lit mieux qu'une boucle, comme dans un manuel. */
+let STRIPT = [];
+function markStrip(i){ STRIP.forEach((b,j)=>b.classList.toggle("on", j===i)); }
+
+function buildStrip(ex){
+  const box=$("#vStrip"); if(!box||!rend) return;
+  box.innerHTML=""; STRIP=[]; STRIPT=[];
+  const dur = ex.anim[ex.anim.length-1].t;
+
+  /* Quelles positions montrer ?
+     - geste enchaîné (saut, décélération) : les temps forts déjà datés
+     - geste à maintien : la PHASE DE TRAVAIL échantillonnée régulièrement, du départ
+       jusqu'au point limite. Les images-clés seules ne donneraient que deux poses,
+       parce que le maintien les duplique. */
+  let times;
+  if(ex.segs){
+    times = ex.segs.map(sg=>sg.t);
+  } else {
+    let tPeak = ex.anim[0].t, peak = -1;
+    ex.anim.forEach(f=>{ const v=Math.abs(kfVal(f,primaryKey)); if(v>peak+1e-6){ peak=v; tPeak=f.t; } });
+    if(tPeak<=0.001) tPeak = dur*0.3;
+    times = [0,.25,.5,.75,1].map(u=>u*tPeak);
+  }
+  times = times.slice(0,6);
+  if(times.length<2) return;
+
+  const save=tAcc;
+  times.forEach((t,i)=>{
+    const pose = samplePose(ex.anim, t);
+    applyPose(ex, pose);
+    updateFollows(); updateGuides();
+    rend.render(scene,cam);
+    let url=null;
+    try{ url = rend.domElement.toDataURL("image/jpeg", .74); }catch(err){}
+    const b=document.createElement("button");
+    b.type="button";
+    b.setAttribute("aria-label","Position "+(i+1));
+    b.innerHTML = (url ? '<img alt="" src="'+url+'">' : '') + '<span>'+stripLabelAt(ex,pose,t,i)+'</span>';
+    b.onclick=()=>{ playing=false; $("#vPlay").textContent="▶ Lire"; tAcc=t; markStrip(i); };
+    box.appendChild(b); STRIP.push(b); STRIPT.push(t);
+  });
+  tAcc=save;
+}
+
+function stripLabelAt(ex, pose, t, i){
+  if(ex.segs){
+    let l=ex.segs[0].l; ex.segs.forEach(sg=>{ if(t>=sg.t) l=sg.l; });
+    return (i+1)+" · "+l;
+  }
+  if(primaryKey==="lift"){
+    const v=ex.anim.map(x=>(x.lift||0)), lo=Math.min(...v), hi=Math.max(...v);
+    const cur=pose.lift||0, u=(hi-lo)?((cur-lo)/(hi-lo)):0;
+    return (i+1)+" · bassin "+Math.round(u*100)+" %";
+  }
+  const u = primaryKey==="ank" ? "° cheville" : (primaryKey==="torso" ? "° tronc"
+          : (primaryKey==="prx" ? "° d'inclinaison" : (primaryKey==="abd" ? "° d'écart" : "° genou")));
+  return (i+1)+" · "+Math.round(Math.abs(pose[primaryKey]||0))+u;
+}
+
+function setCam(mode){
+  const d0 = (curEx && curEx.dist) ? curEx.dist : 2.9;
+  if(mode==="side"){ yaw=Math.PI/2; pitch=.06; dist=d0; }
+  else if(mode==="front"){ yaw=0; pitch=.06; dist=d0; }
+  else { yaw=Math.PI/4.2; pitch=.22; dist=d0*1.07; }
+  document.querySelectorAll('.vctrl button[data-cam]').forEach(b=>b.classList.toggle("on", b.dataset.cam===mode));
+}
+
+let curId = null;
+function openViewer(id){
+  const e = EX[id]; if(!e) return;
+  curId = id;
+  const tb=$("#vTimer");
+  if(tb){
+    tb.style.display = TMR[id] ? "" : "none";
+    const live = TM && TM.id===id && !$("#vTmrBar").hidden;
+    tb.classList.toggle("live", !!live);
+    tb.textContent = live ? "⏱ En cours" : "⏱ Minuteur";
+  }
+
+  /* La fiche s'ouvre d'abord : le texte doit rester lisible même si la 3D échoue. */
+  $("#vName").textContent = e.n;
+  $("#vPhase").textContent = e.ph.join(" · ") + " — " + e.tag;
+  $("#viewer").classList.add("on");
+  $("#viewer .vbody").scrollTop = 0;
+
+  if(GL_OK){
+    try{
+      curEx = e; tAcc = 0; pickPrimary(e);
+      const sk0=$("#vSeek"); if(sk0) sk0.value=0;
+      const st0=$("#vStrip"); if(st0) st0.innerHTML=""; STRIP=[]; STRIPT=[];
+      while(propGrp.children.length) propGrp.remove(propGrp.children[0]);
+      propGrp.add(buildProps(e.props));
+      setCam(e.cam||"side");
+      playing = !RM; $("#vPlay").textContent = playing ? "⏸ Pause" : "▶ Lire";
+      setTimeout(()=>{
+        dispatchEvent(new Event("resize"));
+        try{ buildTrails(e); buildStrip(e); }catch(err){}
+      },40);
+    }catch(err){ curEx=null; glFail("La figure 3D n'a pas pu s'afficher pour ce mouvement."); }
+  }
+
+  const dl=$("#vParams"); dl.innerHTML="";
+  Object.entries(e.params||{}).forEach(([k,v])=>{ dl.appendChild(el("dt",null,k)); dl.appendChild(el("dd",null,v)); });
+  const ol=$("#vSteps"); ol.innerHTML="";
+  (e.steps||[]).forEach(s=>ol.appendChild(el("li",null,s)));
+  $("#vWarn").innerHTML = e.warn ? '<div class="note bad"><strong>Point de vigilance.</strong> '+e.warn+'</div>' : "";
+}
+function closeViewer(){ $("#viewer").classList.remove("on"); }
+
+/* Repli lisible quand le moteur 3D n'est pas disponible : la fiche technique
+   reste entièrement utilisable, c'est elle qui porte le dosage et l'exécution. */
+function glFail(msg){
+  GL_OK = false; curEx = null;
+  const w = $("#canwrap");
+  w.innerHTML = '<div style="padding:22px 16px;color:var(--txt2);font-size:13px;line-height:1.55">'
+    + '<b style="font-family:\'Barlow Condensed\',sans-serif;font-size:17px;color:var(--txt);display:block;margin-bottom:5px">Aperçu 3D indisponible</b>'
+    + msg + ' Vérifie ta connexion puis recharge la page. Le dosage et l\'exécution ci-dessous restent complets.</div>';
+  w.style.touchAction = "auto"; w.style.cursor = "default";
+  document.querySelectorAll('.vctrl button').forEach(b=>{ b.disabled=true; b.style.opacity=".45"; });
+}
+
+/* ============================================================
+   10. NAVIGATION ET DÉMARRAGE
+   ============================================================ */
+const TABS=[
+  {id:"today",l:"Aujourd'hui",p:"M3 9l9-6 9 6v11a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"},
+  {id:"ex",   l:"Exercices",  p:"M4 9v6M20 9v6M7 7v10M17 7v10M7 12h10"},
+  {id:"kpi",  l:"KPI",        p:"M4 19V5M4 19h16M8 19v-6M12 19V9M16 19v-9M20 19v-4"},
+  {id:"week", l:"Semaine",    p:"M4 6h16v14H4zM4 10h16M9 6V3M15 6V3M8 14h2M14 14h2M8 17h2M14 17h2"},
+  {id:"proto",l:"Protocole",  p:"M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5"}
+];
+function renderNav(){
+  const n=$("#nav"); n.innerHTML="";
+  TABS.forEach((t,i)=>{
+    const b=el("button","tab"+(i===0?" on":""));
+    b.dataset.t=t.id;
+    b.innerHTML='<svg viewBox="0 0 24 24"><path d="'+t.p+'"/></svg><b>'+t.l+'</b>';
+    b.onclick=()=>go(t.id);
+    n.appendChild(b);
+  });
+}
+function go(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on", s.id==="s-"+id));
+  document.querySelectorAll("nav .tab").forEach(b=>b.classList.toggle("on", b.dataset.t===id));
+  $("main").scrollTop=0;
+}
+
+function start(){
+  load();
+  if(!DB.set.start) { DB.set.start=T; save(); }
+  renderNav(); renderToday(); renderEx(); renderKpi(); renderWeek(); renderProto();
+
+  $("#tmrClose").onclick=closeTimer;
+  $("#tmrSound").onclick=()=>{ tmrSnd=!tmrSnd; $("#tmrSound").style.color = tmrSnd?"var(--gold)":"var(--txt3)";
+    $("#tmrSound").textContent = tmrSnd?"♪":"✕"; if(tmrSnd) beep(760,.10); };
+  $("#tmrSound").style.color="var(--gold)";
+  $("#tmrGo").onclick=()=>{
+    if(!TM) return;
+    const k=TM.ph[TM.i].k;
+    if(k==="set"){ tmrAdvance(); return; }
+    if(k==="done"){ TM.ph=tmrSeqBuild(TM.c); TM.i=0; TM.el=0; TM.last=-1; TM.t0=Date.now(); TM.run=true; beep(520,.14); tmrRender(); return; }
+    if(TM.run){ TM.el=tmrElapsed(); TM.run=false; }
+    else { TM.t0=Date.now(); TM.run=true; beep(520,.12); }
+    tmrRender();
+  };
+  $("#tmrSkip").onclick=()=>{ if(TM) tmrAdvance(); };
+  $("#vtGo").onclick=()=>$("#tmrGo").onclick();
+  $("#vtSkip").onclick=()=>{ if(TM) tmrAdvance(); };
+  $("#vtStop").onclick=stopInlineTimer;
+  $("#vtFull").onclick=()=>{
+    if(!TM) return;
+    const e=EX[TM.id], c=TM.c;
+    $("#tmrName").textContent = e?e.n:"Minuteur";
+    $("#tmrSub").textContent = (c.work ? c.series+" × "+c.work+" s · repos "+fmtS(c.rest)
+      : c.series+" × "+c.reps+" reps · repos "+fmtS(c.rest))+((c.sides||1)>1?" · les deux côtés":"");
+    $("#tmr").classList.add("on"); tmrCfgRender(); tmrRender();
+  };
+  $("#tmrPlus").onclick=()=>{ if(TM && TM.ph[TM.i].d>0){ TM.ph[TM.i].d+=30; tmrRender(); } };
+  $("#tmrReset").onclick=()=>{ if(!TM) return; TM.ph=tmrSeqBuild(TM.c); TM.i=0; TM.el=0; TM.run=false; TM.last=-1; tmrRender(); };
+  addEventListener("keydown",e=>{ if(e.key==="Escape" && $("#tmr").classList.contains("on")) closeTimer(); });
+
+  $("#vClose").onclick=closeViewer;
+  $("#vPlay").onclick=()=>{ playing=!playing; $("#vPlay").textContent=playing?"⏸ Pause":"▶ Lire"; };
+  $("#vSlow").onclick=()=>{ slow=!slow; $("#vSlow").classList.toggle("on",slow); };
+  $("#vGuide").classList.add("on");
+  $("#vGuide").onclick=()=>{ guidesOn=!guidesOn; $("#vGuide").classList.toggle("on",guidesOn); };
+  $("#vTimer").onclick=()=>{ if(curId && TMR[curId]) startInlineTimer(curId); };
+
+  const sk=$("#vSeek");
+  const seek=()=>{ if(!curEx) return;
+    playing=false; $("#vPlay").textContent="▶ Lire";
+    tAcc = (+sk.value/1000) * curEx.anim[curEx.anim.length-1].t;
+  };
+  sk.addEventListener("pointerdown",()=>{seeking=true;});
+  sk.addEventListener("pointerup",()=>{seeking=false;});
+  sk.addEventListener("input",seek);
+  sk.addEventListener("change",()=>{seeking=false;seek();});
+
+  $("#vStep").onclick=()=>{
+    if(!curEx) return;
+    playing=false; $("#vPlay").textContent="▶ Lire";
+    const ts=curEx.anim.map(f=>f.t), dur=ts[ts.length-1];
+    const cur=tAcc%dur;
+    const nxt=ts.find(t=>t>cur+0.015);
+    tAcc = (nxt==null?0:nxt);
+  };
+  document.querySelectorAll('.vctrl button[data-cam]').forEach(b=>b.onclick=()=>setCam(b.dataset.cam));
+  addEventListener("keydown",e=>{ if(e.key==="Escape") closeViewer(); });
+
+  /* Invite d'installation Chrome/Android. L'événement n'est émis que si le manifeste
+     est valide et la page pas déjà installée — c'est donc aussi un test d'installabilité. */
+  let bip=null;
+  addEventListener("beforeinstallprompt", e=>{
+    e.preventDefault(); bip=e;
+    const b=$("#instBtn"); if(b) b.hidden=false;
+  });
+  $("#instBtn").onclick=async()=>{
+    if(bip){
+      try{ bip.prompt(); await bip.userChoice; }catch(e){}
+      bip=null; $("#instBtn").hidden=true; return;
+    }
+    /* Pas d'invite native : on explique la voie manuelle au lieu de ne rien faire. */
+    const ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const framed = (()=>{ try{ return window.top!==window.self; }catch(e){ return true; } })();
+    let why = "Raison probable : ";
+    if(ios) why += "sur iPhone, l'installation passe toujours par Safari — bouton Partager, puis « Sur l'écran d'accueil ». Chrome iOS ne sait pas le faire.";
+    else if(framed) why += "cette page s'affiche dans un cadre intégré. Ouvre le lien directement dans Chrome, pas depuis une autre application.";
+    else why += "Chrome réclame un fichier de service worker séparé, impossible dans une page autonome comme celle-ci. L'ajout manuel fonctionne quand même.";
+    $("#instWhy").textContent = why;
+    $("#instSheet").hidden = false;
+  };
+  $("#instClose").onclick=()=>{ $("#instSheet").hidden=true; };
+  addEventListener("appinstalled", ()=>{ const b=$("#instBtn"); if(b) b.hidden=true; });
+  try{ if(matchMedia("(display-mode: standalone)").matches){ const b=$("#instBtn"); if(b) b.hidden=true; } }catch(e){}
+
+  $("#themeBtn").onclick=()=>{
+    const cur=document.documentElement.getAttribute("data-theme");
+    const dark = cur ? cur==="dark" : !matchMedia("(prefers-color-scheme: light)").matches;
+    document.documentElement.setAttribute("data-theme", dark?"light":"dark");
+    try{ localStorage.setItem(KEY+":theme", dark?"light":"dark"); }catch(e){}
+  };
+  try{ const th=localStorage.getItem(KEY+":theme"); if(th) document.documentElement.setAttribute("data-theme",th); }catch(e){}
+
+  $("#visaClose").onclick=()=>$("#visa").classList.remove("on");
+  $("#visaSave").onclick=()=>{
+    const r=visaTotal();
+    if(!r.complete){ $("#visaSave").textContent="Réponds aux "+(8-r.done)+" question(s) restante(s)";
+      setTimeout(()=>$("#visaSave").textContent="Enregistrer ce score",2600); return; }
+    week(weekKey(T)).visa = r.tot; save();
+    renderKpi(); renderProto();
+    $("#visaSave").textContent="Score "+r.tot+" enregistré";
+    setTimeout(()=>{ $("#visaSave").textContent="Enregistrer ce score"; $("#visa").classList.remove("on"); },1100);
+  };
+  $("#visaWipe").onclick=()=>{
+    const w=week(weekKey(T)); w.visaA={}; save(); renderVisa();
+  };
+
+  $("#copyBtn").onclick=async()=>{
+    const txt=JSON.stringify(DB,null,1);
+    try{ await navigator.clipboard.writeText(txt); $("#copyBtn").textContent="Copié dans le presse-papiers"; }
+    catch(e){ $("#copyBtn").textContent="Copie refusée par le navigateur"; }
+    setTimeout(()=>$("#copyBtn").textContent="Copier mes données",2200);
+  };
+  $("#resetBtn").onclick=()=>{
+    if($("#resetBtn").dataset.c!=="1"){ $("#resetBtn").dataset.c="1"; $("#resetBtn").textContent="Confirmer l'effacement"; setTimeout(()=>{$("#resetBtn").dataset.c="";$("#resetBtn").textContent="Effacer tout";},4000); return; }
+    DB={days:{},weeks:{},set:{phase:"S1",start:T}}; save();
+    renderToday(); renderKpi(); renderWeek(); renderProto();
+    $("#resetBtn").dataset.c=""; $("#resetBtn").textContent="Effacer tout";
+  };
+
+  /* En dernier, et isolée : une panne du moteur 3D ne doit jamais empêcher
+     le reste de l'application de fonctionner. */
+  if(window.THREE){
+    try{ initGL(); GL_OK = true; }
+    catch(err){ glFail("Le moteur 3D n'a pas démarré sur cet appareil."); }
+  } else {
+    glFail("La librairie 3D n'a pas pu être téléchargée.");
+  }
+}
+/* ============================================================
+   11. DÉMARRAGE — écran de chargement puis moteur 3D
+   ============================================================ */
+function bootMsg(txt, pct, ok){
+  const m=document.getElementById("bootMsg"), b=document.getElementById("bootBar");
+  if(m){ m.textContent=txt; m.className = "bmsg"+(ok?" ok":""); }
+  if(b && pct!=null) b.style.width = pct+"%";
+}
+function bootHide(){
+  const el=document.getElementById("boot");
+  if(!el) return;
+  el.classList.add("off");
+  setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 380);
+}
+
+function loadThree(cb){
+  /* Fichier local en premier : c'est lui qui permet le fonctionnement hors ligne.
+     Les deux CDN ne servent que si le fichier local manque. */
+  const urls=[
+    "./three.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.128.0/three.min.js",
+    "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"
+  ];
+  let i=0;
+  (function attempt(){
+    if(window.THREE){ cb(true); return; }
+    if(i>=urls.length){ cb(false); return; }
+    bootMsg(i===0 ? "Chargement du moteur 3D…" : "Fichier local absent, passage par le réseau…", i===0?35:55);
+    const sc=document.createElement("script");
+    sc.src=urls[i++]; sc.async=false;
+    sc.onload=()=>{ cb(!!window.THREE); };
+    sc.onerror=attempt;
+    document.head.appendChild(sc);
+  })();
+}
+
+function boot(){
+  bootMsg("Préparation de l'interface…", 15);
+  loadThree(okThree=>{
+    bootMsg(okThree ? "Construction de la figure anatomique…" : "Moteur 3D indisponible — mode texte", 72);
+    setTimeout(()=>{
+      try{ start(); }catch(err){ bootMsg("Erreur au démarrage", 100); }
+      const fin=()=>{
+        bootMsg(okThree ? "Prêt" : "Prêt — sans aperçu 3D", 100, true);
+        setTimeout(bootHide, 480);
+      };
+      /* on attend aussi les polices : sinon le texte saute juste après l'affichage */
+      let waited=false;
+      const go=()=>{ if(!waited){ waited=true; fin(); } };
+      try{
+        bootMsg("Chargement des polices…", 88);
+        if(document.fonts && document.fonts.ready) document.fonts.ready.then(go);
+        else go();
+      }catch(e){ go(); }
+      setTimeout(go, 2500);
+    }, 40);
+  });
+}
+
+/* Service worker : mise en cache de l'app pour un fonctionnement hors ligne complet. */
+if("serviceWorker" in navigator){
+  addEventListener("load", ()=>{
+    navigator.serviceWorker.register("./sw.js").then(reg=>{
+      reg.addEventListener("updatefound", ()=>{
+        const nw=reg.installing||reg.waiting;
+        if(nw) nw.addEventListener("statechange", ()=>{
+          if(nw.state==="installed" && navigator.serviceWorker.controller){
+            const b=document.getElementById("instBtn");
+            if(b){ b.textContent="Mettre à jour"; b.onclick=()=>location.reload(); }
+          }
+        });
+      });
+    }).catch(()=>{});
+  });
+}
+
+if(document.readyState === "loading") addEventListener("DOMContentLoaded", boot);
+else boot();
+</script>
+</body>
+</html>
