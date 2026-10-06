@@ -1405,7 +1405,7 @@ function renderToday(){
     const c = el("button","chk",CHK);
     c.setAttribute("aria-pressed", done?"true":"false");
     c.setAttribute("aria-label",(done?"Décocher":"Cocher")+" "+s.n);
-    c.onclick=()=>{ if(d.supps[s.id]) delete d.supps[s.id]; else d.supps[s.id]=1; save(); renderToday(); };
+    c.onclick=()=>{ if(d.supps[s.id]) delete d.supps[s.id]; else d.supps[s.id]=1; save(); renderToday(); renderWeek(); };
     r.appendChild(c);
     const body = el("div","body");
     body.appendChild(el("div","name",s.n));
@@ -1541,7 +1541,7 @@ function renderKpi(){
       for(let i=0;i<=10;i++){
         const b=el("button",d.kpi[k.id]===i?"on":"",String(i));
         b.dataset.z=zone(i); b.setAttribute("aria-label",k.q+" : "+i);
-        b.onclick=()=>{ d.kpi[k.id]= d.kpi[k.id]===i?null:i; if(d.kpi[k.id]==null) delete d.kpi[k.id]; save(); renderKpi(); renderToday(); };
+        b.onclick=()=>{ d.kpi[k.id]= d.kpi[k.id]===i?null:i; if(d.kpi[k.id]==null) delete d.kpi[k.id]; save(); renderKpi(); renderToday(); renderWeek(); renderProto(); };
         s.appendChild(b);
       }
       f.appendChild(s);
