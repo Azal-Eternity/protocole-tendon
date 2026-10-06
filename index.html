@@ -2191,7 +2191,9 @@ function buildProps(list){
     else if(d.f) follows.push({m:m, f:d.f, o:o, q:d.q, lockY:d.lockY});
   });
 }
-const UPV = new THREE.Vector3(0,1,0);
+/* créé au premier usage : THREE n'est chargé qu'après boot() */
+let UPV = null;
+function upv(){ return UPV || (UPV = new THREE.Vector3(0,1,0)); }
 
 /* Trajectoires : le trajet du bassin et celui du genou pendant tout le cycle.
    Sur le Spanish squat le genou se réduit à un point — c'est la démonstration
@@ -2247,7 +2249,7 @@ function updateGuides(){
   const dir = new THREE.Vector3(0,-1,0).applyQuaternion(q).normalize();
   const len = dir.y < -.05 ? Math.min(1.1, k.y/(-dir.y)) : .50;
   GUIDE.tib.position.copy(k).addScaledVector(dir, len/2);
-  GUIDE.tib.quaternion.setFromUnitVectors(UPV, dir);
+  GUIDE.tib.quaternion.setFromUnitVectors(upv(), dir);
   GUIDE.tib.scale.set(1,len,1);
 
   GUIDE.mark.position.set(a.x, .006, a.z);
@@ -2277,7 +2279,7 @@ function updateFollows(){
       const fr = new THREE.Vector3(fl.from[0], fl.from[1], fl.from[2]);
       const dir = to.clone().sub(fr), len = Math.max(.02, dir.length());
       fl.m.position.copy(fr).addScaledVector(dir, .5);
-      fl.m.quaternion.setFromUnitVectors(UPV, dir.normalize());
+      fl.m.quaternion.setFromUnitVectors(upv(), dir.normalize());
       fl.m.scale.set(1, len, 1);
       return;
     }
