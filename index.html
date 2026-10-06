@@ -2621,7 +2621,7 @@ function openViewer(id){
       const sk0=$("#vSeek"); if(sk0) sk0.value=0;
       const st0=$("#vStrip"); if(st0) st0.innerHTML=""; STRIP=[]; STRIPT=[];
       while(propGrp.children.length) propGrp.remove(propGrp.children[0]);
-      propGrp.add(buildProps(e.props));
+      buildProps(e.props);
       setCam(e.cam||"side");
       playing = !RM; $("#vPlay").textContent = playing ? "⏸ Pause" : "▶ Lire";
       setTimeout(()=>{
