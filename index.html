@@ -589,7 +589,9 @@ header button#instBtn{
     <div class="btnrow">
       <button class="btn ghost" id="copyBtn">Copier mes données</button>
       <button class="btn ghost" id="resetBtn">Effacer tout</button>
+      <button class="btn ghost" id="updBtn">Forcer la mise à jour</button>
     </div>
+    <div id="verTxt" style="padding:0 14px 12px;font-size:12px;color:var(--txt3)"></div>
     <details class="imp">
       <summary>Importer des données (fusion, sans rien écraser)</summary>
       <textarea id="impTxt" rows="5" placeholder="Colle ici un JSON exporté ou fourni par Claude (mesures Garmin, historique)…"></textarea>
@@ -1349,6 +1351,7 @@ const WKPIS = [
    2. STOCKAGE
    ============================================================ */
 const KEY = "tendon:v1";
+const APP_V = "v3";   /* à garder identique à VERSION dans sw.js */
 let DB = {days:{}, weeks:{}, set:{phase:"S1", start:todayISO()}};
 
 function todayISO(d){ const x = d||new Date(); return [x.getFullYear(), String(x.getMonth()+1).padStart(2,"0"), String(x.getDate()).padStart(2,"0")].join("-"); }
@@ -1881,7 +1884,7 @@ function renderWeek(){
   rows.forEach(([k,lab])=>{
     g.appendChild(el("div","rl",lab));
     days.forEach(iso=>{
-      const ids=planFor(iso).filter(id=>BLOCKS[id]&&BLOCKS[id].k===k);
+      const ids=iso<(DB.set.start||iso) ? [] : planFor(iso).filter(id=>BLOCKS[id]&&BLOCKS[id].k===k);   /* avant le début : rien de prévu */
       const d=DB.days[iso]||{blocks:{}};
       if(!ids.length){ g.appendChild(el("div","cell na","")); return; }
       const n=ids.filter(id=>d.blocks&&d.blocks[id]).length;
@@ -2966,6 +2969,14 @@ function mergeImport(inc){
   const isD=/^\d{4}-\d{2}-\d{2}$/, isW=/^w\d{4}-\d{2}-\d{2}$/;
   const pick=(o,re)=>{ const r={}; Object.keys(o||{}).forEach(k=>{ if(re.test(k)&&o[k]&&typeof o[k]==="object") r[k]=o[k]; }); return r; };
   let n=0;
+  /* Date de début : seulement pour la ramener plus tôt (restauration sur un stockage vide).
+     Jamais repoussée, jamais remplacée par une date plus récente. */
+  const s0=inc.set&&inc.set.start;
+  if(typeof s0==="string" && isD.test(s0) && s0<(DB.set.start||s0)){
+    const old=DB.set.start; DB.set.start=s0;
+    phaseLog().forEach(e=>{ if(e.from===old) e.from=s0; });
+    n++;
+  }
   n+=fillMissing(DB.days, pick(inc.days,isD));
   n+=fillMissing(DB.weeks, pick(inc.weeks,isW));
   DB.g=DB.g||{}; n+=fillMissing(DB.g, pick(inc.g,isD));
@@ -3101,6 +3112,18 @@ function start(){
     catch(e){ $("#copyBtn").textContent="Copie refusée par le navigateur"; }
     setTimeout(()=>$("#copyBtn").textContent="Copier mes données",2200);
   };
+  $("#verTxt").textContent="Version de l'application : "+APP_V+". Une mise à jour ne touche jamais tes données.";
+  $("#updBtn").onclick=async()=>{
+    const b=$("#updBtn");
+    if(!navigator.onLine){ b.textContent="Connexion nécessaire"; setTimeout(()=>b.textContent="Forcer la mise à jour",2500); return; }
+    b.textContent="Mise à jour…";
+    /* Vide uniquement le cache de l'application et le service worker, pas le stockage des données. */
+    try{
+      if(window.caches){ const ks=await caches.keys(); await Promise.all(ks.map(k=>caches.delete(k))); }
+      if(navigator.serviceWorker){ const rs=await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(r=>r.unregister())); }
+    }catch(e){}
+    location.replace(location.pathname+"?maj="+Date.now());
+  };
   $("#impBtn").onclick=()=>{
     const msg=$("#impMsg");
     let inc;
@@ -3197,7 +3220,7 @@ if("serviceWorker" in navigator){
         if(nw) nw.addEventListener("statechange", ()=>{
           if(nw.state==="installed" && navigator.serviceWorker.controller){
             const b=document.getElementById("instBtn");
-            if(b){ b.textContent="Mettre à jour"; b.onclick=()=>location.reload(); }
+            if(b){ b.hidden=false; b.textContent="Mettre à jour"; b.onclick=()=>location.reload(); }
           }
         });
       });
