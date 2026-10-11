@@ -74,6 +74,18 @@ Sans ce changement de version, les téléphones continuent de servir l'ancienne 
 leur cache. Une fois la nouvelle version détectée, le bouton de l'en-tête devient
 **« Mettre à jour »**.
 
+## Calendrier, critères de passage et données Garmin
+
+- **Onglet Protocole, en haut** : trajectoire VISA-P (plancher attendu chaque dimanche), critères de
+  passage calculés sur les données saisies, liste jour par jour jusqu'au 22 novembre.
+- **Les phases avancent sur critères, pas sur la date.** Chaque changement est inscrit avec sa date
+  (`set.log`) : les jours passés gardent leur plan d'origine, l'historique n'est jamais réécrit.
+- **Onglet Semaine → Importer** : fusionne un JSON (mesures Garmin, historique) sans écraser aucune
+  valeur déjà saisie. Une copie de sécurité est gardée avant chaque fusion.
+- **Données de santé hors du dépôt.** Le dépôt est public : les mesures Garmin et l'historique ne sont
+  jamais écrits dans le code. Le dossier `donnees-perso/` est ignoré par git ; son contenu se colle
+  dans l'importateur depuis le téléphone.
+
 ## Sauvegarde des données
 
 Les mesures, séances cochées et scores vivent dans le stockage local du navigateur. Ils ne

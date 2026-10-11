@@ -271,6 +271,33 @@ table.grid td b{font-weight:600}
 .week .cell.m{background:var(--surf2);color:var(--txt3)}
 .week .cell.na{background:transparent;border-color:transparent}
 
+/* ============ CALENDRIER ============ */
+details.cw{margin:10px 14px 0;border:1px solid var(--line);border-radius:var(--r);background:var(--surf)}
+details.cw>summary{cursor:pointer;padding:10px 12px;font-family:"Barlow Condensed",sans-serif;font-size:16px;font-weight:600;list-style:none}
+details.cw>summary::-webkit-details-marker{display:none}
+details.cw>summary small{font-family:"IBM Plex Sans",sans-serif;font-weight:400;font-size:12px;color:var(--txt3);margin-left:6px}
+.calrow{display:grid;grid-template-columns:54px 1fr auto;gap:9px;padding:9px 12px;border-top:1px solid var(--line);font-size:12.5px}
+.calrow.today{border-left:3px solid var(--gold);padding-left:9px;background:var(--gold-f)}
+.calrow.past{opacity:.72}
+.calrow .dt{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:15px;line-height:1.1}
+.calrow .dt i{display:block;font-style:normal;font-family:"IBM Plex Sans",sans-serif;font-weight:400;font-size:10.5px;color:var(--txt3)}
+.calrow .tx{color:var(--txt2)}
+.calrow .tx em{display:block;font-style:normal;font-size:11.5px;color:var(--txt3);margin-top:2px}
+.calrow .res{font-size:11.5px;color:var(--ok);white-space:nowrap}
+.chip{display:inline-block;border:1px solid var(--line2);border-radius:999px;padding:0 7px;font-size:10.5px;margin-left:5px;color:var(--txt2);vertical-align:1px}
+.chip.t{border-color:var(--gold);color:var(--gold)}
+.chip.g{border-color:var(--ok);color:var(--ok)}
+.gate{margin:10px 14px 0;border:1px solid var(--line);border-radius:var(--r);background:var(--surf)}
+.gate .gi{display:flex;gap:9px;align-items:flex-start;padding:8px 12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--txt2)}
+.gate .gi:first-child{border-top:0}
+.gate .gi b{flex:0 0 auto;width:18px;text-align:center}
+.gate .gi.ok b{color:var(--ok)} .gate .gi.no b{color:var(--bad)}
+.gate .gi span{flex:1 1 auto} .gate .gi i{font-style:normal;color:var(--txt3);white-space:nowrap}
+details.imp{margin:0 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surf);padding:0 12px}
+details.imp>summary{cursor:pointer;padding:10px 0;font-size:13px;color:var(--txt2)}
+details.imp textarea{width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);padding:8px;font-size:12px;font-family:ui-monospace,Consolas,monospace}
+details.imp .h{font-size:12.5px;color:var(--txt2);padding:6px 0 10px}
+
 /* ============ 3D VIEWER ============ */
 #tmr{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;flex-direction:column}
 #tmr.on{display:flex}
@@ -495,6 +522,8 @@ header button#instBtn{
       <div class="exp">Renseigne ta douleur du matin dans l'onglet KPI pour obtenir le verdict.</div>
     </div>
 
+    <div id="calCard"></div>
+
     <div class="sec">
       <h2 id="todayTitle">Séance du jour</h2>
       <p class="lede" id="todayLede"></p>
@@ -533,7 +562,7 @@ header button#instBtn{
 
     <div class="sec">
       <h2>Douleur au squat déclin — 14 derniers jours</h2>
-      <p class="lede">Objectif de la semaine 1 : passer sous 3. Objectif J21 : sous 2.</p>
+      <p class="lede">Passer sous 3 trois jours de suite pour entrer en S2, puis tenir 2 ou moins avant la pliométrie.</p>
     </div>
     <div class="spark" id="sparkPain"></div>
     <div class="sparklab" id="sparkPainLab"></div>
@@ -561,10 +590,17 @@ header button#instBtn{
       <button class="btn ghost" id="copyBtn">Copier mes données</button>
       <button class="btn ghost" id="resetBtn">Effacer tout</button>
     </div>
+    <details class="imp">
+      <summary>Importer des données (fusion, sans rien écraser)</summary>
+      <textarea id="impTxt" rows="5" placeholder="Colle ici un JSON exporté ou fourni par Claude (mesures Garmin, historique)…"></textarea>
+      <div class="btnrow" style="padding:8px 0 0"><button class="btn ghost" id="impBtn">Fusionner</button></div>
+      <div class="h" id="impMsg">Seules les valeurs absentes sont ajoutées. Tes séances, mesures et scores déjà saisis ne sont jamais modifiés. Une copie de sécurité est gardée avant chaque fusion.</div>
+    </details>
   </section>
 
   <!-- ========================= PROTOCOLE ========================= -->
   <section class="screen" id="s-proto">
+    <div id="calSec"></div>
     <div class="sec">
       <h2>Phase en cours</h2>
       <p class="lede">Touche une semaine pour la consulter : ça ne change rien à ton programme. Pour changer réellement de semaine, utilise le bouton d'activation en dessous.</p>
@@ -609,7 +645,7 @@ header button#instBtn{
       <strong>À refuser</strong> — injection de corticoïdes (soulage à 6 semaines, dégrade à 6 mois, risque de rupture) et anti-inflammatoires en continu (ils inhibent la synthèse de collagène, tu annules ton propre programme). Jamais de séance sous AINS : tu supprimes ton seul système d'alerte.
     </div>
 
-    <div class="sec"><h2>Test de sortie — J21</h2></div>
+    <div class="sec"><h2>Test de sortie — dimanche 15 novembre (J41)</h2></div>
     <div style="padding:0 14px">
       <table class="grid">
         <tr><th>Test</th><th>Validation</th></tr>
@@ -626,7 +662,7 @@ header button#instBtn{
       <strong>3/5 ou moins</strong> → bilan kiné en présentiel. Le protocole seul ne suffit pas.
     </div>
     <div class="note bad">
-      <strong>Le délai honnête.</strong> Avec une douleur de départ à 5/10 et trois mois d'évolution, J21 te ramène à l'entraînement complet, pas au match complet. Match de 30-45 min vers J28-J35, match entier vers J45-J60. Forcer le match à J21 est le scénario qui coûte trois mois.
+      <strong>Le délai honnête.</strong> Avec une douleur de départ à 5/10 et trois mois d'évolution, la sortie te ramène à l'entraînement complet, pas au match complet. Match de 30-45 min après 5/5 aux tests, match entier vers J55-J70. La S1 a été doublée (assiduité de la première semaine à 52 %) : le calendrier de l'onglet Protocole avance sur critères, pas sur la date. Forcer le match avant les tests est le scénario qui coûte trois mois.
     </div>
   </section>
 </main>
@@ -762,7 +798,7 @@ const EX = {
     n:"Spanish squat", ph:["S1","S2","S3"], k:"iso", star:true,
     tag:"Isométrie — le traitement principal",
     params:{"Dosage":"5 × 45 s — minuteur intégré","Repos":"2 min entre séries","Angle genou":"60° (45° si douleur > 4)",
-            "Moment":"6 h 00 tous les jours + 21 h 00","Douleur acceptable":"3-4/10 pendant l'effort",
+            "Moment":"6 h 00 tous les jours + 20 h 00","Douleur acceptable":"3-4/10 pendant l'effort",
             "Attendu":"douleur immédiatement après ≤ douleur avant"},
     steps:[
       "Fixe une sangle ou un élastique épais à un point d'ancrage bas, derrière toi, et passe-la derrière tes deux genoux.",
@@ -1162,7 +1198,7 @@ const EX = {
 const BLOCKS = {
   isoAM:   {n:"Bloc A — Isométrie",            k:"iso",     when:"6 h 00", s:"Spanish squat 5 × 45 s, repos 2 min, genou 60°", ex:"spanish"},
   isoPrime:{n:"Bloc A — Priming isométrique",  k:"iso",     when:"6 h 00", s:"Spanish squat 2 × 45 s avant la charge lourde", ex:"spanish"},
-  isoPM:   {n:"Isométrie du soir",             k:"iso",     when:"21 h 00",s:"Spanish squat 3 × 45 s, repos 90 s", ex:"spanish"},
+  isoPM:   {n:"Isométrie du soir",             k:"iso",     when:"20 h 00",s:"Spanish squat 3 × 45 s, repos 90 s", ex:"spanish"},
   forceS1: {n:"Bloc B — Isotonique allégé",    k:"force",   when:"6 h 15", s:"Presse 4 × 15 · Leg ext 3 × 15 · Hip thrust 3 × 12", ex:"legpress"},
   forceS1f:{n:"Bloc B — reporté après l'iftar",k:"force",   when:"20 h 30",s:"Optionnel, 1 h 30 après la rupture du jeûne", ex:"legpress"},
   hsr:     {n:"Bloc B — Charge lourde lente",  k:"force",   when:"6 h 10", s:"Box squat · Presse unipodale · Squat déclin · Nordic", ex:"declinesquat"},
@@ -1193,7 +1229,7 @@ const PROG = {
       0:["isoAM","mobil","isoPM"]
     },
     fast:{1:["forceS1f"],4:["forceS1f"]},
-    ban:"Interdit : course · sauts · frappes · centres · changements de direction · ballon en mouvement · amplitude au-delà de 60°."
+    ban:"Interdit : course · sauts · frappes · centres · changements de direction · ballon en mouvement · amplitude au-delà de 60° · tennis et tout sport hors protocole."
   },
   S2:{
     label:"Semaine 2 — Charge lourde lente",
@@ -1208,7 +1244,7 @@ const PROG = {
       0:["isoAM","course","mobil","isoPM"]
     },
     fast:{1:[],4:[]},
-    ban:"Interdit : frappes · centres · duels · virages serrés · changements de direction · crampons."
+    ban:"Interdit : frappes · centres · duels · virages serrés · changements de direction · crampons · tennis et tout sport hors protocole."
   },
   S3:{
     label:"Semaine 3 — Stockage d'énergie et geste football",
@@ -1233,8 +1269,8 @@ const SUPPS = [
   {id:"d3",   n:"Vitamine D3 4000 UI", when:"matin", s:"Avec un corps gras. À réajuster après dosage de la 25-OH-D."},
   {id:"crea", n:"Créatine 5 g", when:"indifférent", s:"Constance avant timing. Les jours de jeûne : après la rupture."},
   {id:"om3",  n:"Oméga-3 — 2,5 g EPA+DHA", when:"20 h 00", s:"Au repas du soir, absorption lipidique"},
-  {id:"mg",   n:"Magnésium bisglycinate 350 mg", when:"21 h 30", s:"1 h avant le coucher"},
-  {id:"iso2", n:"Isolate 25 g", when:"22 h 00", s:"Uniquement les jours de charge lourde", heavyOnly:true}
+  {id:"mg",   n:"Magnésium bisglycinate 350 mg", when:"21 h 00", s:"1 h avant le coucher de 22 h 00 — lever à 5 h 00 = 7 h de sommeil"},
+  {id:"iso2", n:"Isolate 25 g", when:"21 h 00", s:"Uniquement les jours de charge lourde", heavyOnly:true}
 ];
 
 /* Dosages du minuteur. work = maintien chronométré ; reps + tempo = série comptée
@@ -1304,9 +1340,9 @@ const VISA = [
 ];
 
 const WKPIS = [
-  {id:"visa", q:"Score VISA-P", h:"Questionnaire validé sur 100, cinq minutes. Cible J7 : progression. Cible J21 : 80 ou plus.", type:"num", unit:"/ 100", max:100},
-  {id:"reps", q:"Répétitions avant douleur 4/10", h:"Squat déclin unipodal, compte les répétitions. Cible J21 : 20 ou plus.", type:"num", unit:"reps", max:60},
-  {id:"sym",  q:"Symétrie du saut unipodal", h:"CMJ unipodal, hauteur ou distance, jambe gauche ÷ jambe droite. À partir de J14 seulement. Cible : plus de 90 %.", type:"num", unit:"%", max:120}
+  {id:"visa", q:"Score VISA-P", h:"Questionnaire validé sur 100, cinq minutes. Chaque dimanche. Plancher attendu : voir le tableau du Protocole. Cible : 80 ou plus au test du 15 novembre.", type:"num", unit:"/ 100", max:100},
+  {id:"reps", q:"Répétitions avant douleur 4/10", h:"Squat déclin unipodal, compte les répétitions. Chaque dimanche. Cible avant la pliométrie : 20 ou plus.", type:"num", unit:"reps", max:60},
+  {id:"sym",  q:"Symétrie du saut unipodal", h:"CMJ unipodal, hauteur ou distance, jambe gauche ÷ jambe droite. À partir de la S3 seulement (premier test : dimanche 1er novembre). Cible : plus de 90 %.", type:"num", unit:"%", max:120}
 ];
 
 /* ============================================================
@@ -1340,19 +1376,142 @@ const DOWN = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 const DOWS = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
 const FASTD = [1,4];
 
+/* ---- Phases : journal daté ----
+   La phase n'est plus un réglage global. Chaque changement est inscrit avec sa date dans
+   DB.set.log : les jours déjà vécus gardent leur plan d'origine, donc ni les dénominateurs
+   d'assiduité ni l'historique ne bougent quand on change de phase. Les jours à venir sont
+   une projection : durée minimale de chaque phase, à partir de la phase réellement active. */
+const PHORDER = ["S1","S2","S3"];
+const PH_MIN  = {S1:14, S2:7};                      /* jours minimum avant la phase suivante */
+const EARLY   = {S2:"2026-10-16", S3:"2026-10-23"}; /* plus tôt, ce serait sauter les critères */
+const VISA_FLOOR = {"2026-10-18":70,"2026-10-25":72,"2026-11-01":75,"2026-11-08":78,"2026-11-15":80,"2026-11-22":80};
+const CAL_FROM = "2026-10-12", CAL_WEEKS = 6;
+const MOIS = ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+function fr(iso){ const [y,m,d]=iso.split("-").map(Number); return d+" "+MOIS[m-1]; }
+function daysBetween(a,b){ const p=s=>{const [y,m,d]=s.split("-").map(Number); return Date.UTC(y,m-1,d);}; return Math.round((p(b)-p(a))/86400000); }
+
+function phaseLog(){
+  const s=DB.set;
+  if(!Array.isArray(s.log)||!s.log.length) s.log=[{from:s.start||todayISO(), ph:PROG[s.phase]?s.phase:"S1"}];
+  return s.log;
+}
+function curEntry(){ const t=todayISO(); const l=phaseLog(); let e=l[0]; l.forEach(x=>{ if(x.from<=t) e=x; }); return e; }
+function setPhase(ph){
+  const t=todayISO(), l=phaseLog(), last=l[l.length-1];
+  if(last.from===t) last.ph=ph; else if(last.ph!==ph) l.push({from:t, ph:ph});
+  DB.set.phase=ph; save();
+}
+function projStarts(){
+  const t=todayISO(), c=curEntry(), st={}; let prev=c.from;
+  for(let i=PHORDER.indexOf(c.ph)+1;i<PHORDER.length;i++){
+    let s=shiftISO(prev, PH_MIN[PHORDER[i-1]]);
+    if(s<=t) s=shiftISO(t,1);
+    st[PHORDER[i]]=s; prev=s;
+  }
+  return st;
+}
+function phaseOf(iso){
+  const t=todayISO();
+  if(iso<=t){ let p="S1"; phaseLog().forEach(e=>{ if(e.from<=iso) p=e.ph; }); return p; }
+  const st=projStarts(); let p=curEntry().ph; PHORDER.forEach(k=>{ if(st[k]&&st[k]<=iso) p=k; }); return p;
+}
+function phaseStart(iso){
+  const t=todayISO();
+  if(iso<=t){ let f=DB.set.start||iso; phaseLog().forEach(e=>{ if(e.from<=iso) f=e.from; }); return f; }
+  return projStarts()[phaseOf(iso)] || curEntry().from;
+}
+function stepOf(iso){ return Math.max(0, Math.floor(daysBetween(phaseStart(iso), iso)/7)); }
+
 function planFor(iso){
-  const ph = PROG[DB.set.phase], dow = isoDow(iso);
+  const ph = PROG[phaseOf(iso)], dow = isoDow(iso);
   let ids = (ph.days[dow]||[]).slice();
   if(FASTD.includes(dow)) ids = ids.concat(ph.fast[dow]||[]);
   return ids;
 }
-function protoDay(iso){ return {phase:DB.set.phase, dow:isoDow(iso), fast:FASTD.includes(isoDow(iso))}; }
+function protoDay(iso){ return {phase:phaseOf(iso), dow:isoDow(iso), fast:FASTD.includes(isoDow(iso))}; }
 function heavyDay(iso){ return planFor(iso).some(id=>["forceS1","forceS1f","hsr"].includes(id)); }
 function protoDayNum(iso){
   const s = DB.set.start||iso;
   const a = new Date(s.split("-").map((v,i)=>i===1?v-1:+v)[0], +s.split("-")[1]-1, +s.split("-")[2]);
   const b = new Date(+iso.split("-")[0], +iso.split("-")[1]-1, +iso.split("-")[2]);
   return Math.round((b-a)/86400000)+1;
+}
+
+/* ---- Contenu du calendrier : progression par palier, pas par date ---- */
+const STEPS = {
+  S1:[
+    {t:"Désensibilisation", f:"Isométrie matin et soir, chaîne de soutien, Bloc B allégé. Rien d'autre."},
+    {t:"Consolidation — 6 jours sur 7 complets", f:"Cible : douleur au squat déclin à 3/10 ou moins trois jours de suite, avec au moins 85 % des blocs faits. Bloc B : +5 kg seulement si la douleur à 24 h est stable. Aucun sport hors protocole, tennis compris."}
+  ],
+  S2:[
+    {t:"Charge lourde lente", f:"Trois séances lourdes (mar., ven., sam.) et reprise de la course linéaire. Box squat 4 × 10, 3 s / 3 s, +5 kg seulement si la douleur à 24 h est stable. Club mercredi : participation adaptée, sans duel ni frappe."},
+    {t:"S2 prolongée", f:"Critères de S3 non réunis : refais la même semaine sans augmenter l'amplitude. Une semaine ici coûte moins qu'une rechute en S3."}
+  ],
+  S3:[
+    {t:"Pliométrie — palier 1", f:"CMJ 3 × 6 à 50 %. Décélérations : 6 × 10 m à 60 %, arrêt en 3 appuis. Charge lourde en 4 × 6-8, tempo 2 s / 2 s. Palier suivant seulement avec zéro douleur à 24 h."},
+    {t:"Pliométrie — palier 2", f:"CMJ 4 × 6 à 70 %. Décélérations : monte l'intensité de course avant de réduire les appuis. Sprints à 80 %. Club : entraînement adapté, sans match."},
+    {t:"Pliométrie — palier 3", f:"Drop jump depuis 20 cm, contact au sol sous 250 ms. Décélérations à 75 %, arrêt en 2 appuis, 8 répétitions. Club complet sans match. Dimanche : les cinq tests de sortie."},
+    {t:"Consolidation et reprise du match", f:"Retest VISA-P. 5 tests sur 5 : match de 30-45 min, une fois par semaine au début, jamais deux jours de suite."}
+  ]
+};
+function stepInfo(iso){ const a=STEPS[phaseOf(iso)]; return a[Math.min(stepOf(iso), a.length-1)]; }
+function testsFor(iso){
+  if(isoDow(iso)!==0) return [];
+  const t=["VISA-P, avant toute séance (10 h)","Répétitions avant douleur 4/10, squat déclin unipodal"];
+  if(phaseOf(iso)==="S3") t.push("Saut unipodal : symétrie gauche ÷ droite (cible > 90 %)");
+  if(phaseOf(iso)==="S3" && stepOf(iso)>=2) t.push("Les cinq tests de sortie (onglet Protocole)");
+  return t;
+}
+
+/* ---- Critères de passage, calculés sur les données réelles ---- */
+function painOn(iso){ const d=DB.days[iso]; return d&&d.kpi&&d.kpi.pain!=null ? d.kpi.pain : null; }
+function adherence7(){
+  const t=todayISO(); let p=0,f=0;
+  for(let i=1;i<=7;i++){
+    const iso=shiftISO(t,-i); if(iso<(DB.set.start||iso)) continue;
+    const d=DB.days[iso];
+    planFor(iso).forEach(id=>{ const b=BLOCKS[id]; if(!b||b.k==="cardio"||id==="forceS1f") return; p++; if(d&&d.blocks&&d.blocks[id]) f++; });
+  }
+  return p?Math.round(f/p*100):0;
+}
+function pain3(){
+  const t=todayISO(), s=painOn(t)!=null?0:1;
+  const vals=[0,1,2].map(i=>painOn(shiftISO(t,-(s+i))));
+  return {vals, ok:vals.every(v=>v!=null&&v<=3)};
+}
+function spikes(){
+  const t=todayISO(); let n=0;
+  for(let i=0;i<7;i++){
+    const iso=shiftISO(t,-i), a=painOn(iso), b=painOn(shiftISO(iso,-1));
+    if(a!=null&&b!=null&&a-b>=2&&heavyDay(shiftISO(iso,-1))) n++;
+  }
+  return n;
+}
+function gateFor(toPh){
+  const p=pain3(), ad=adherence7(), sp=spikes(), c=DB.set.chk||{}, it=[];
+  it.push({ok:p.ok, t:"Douleur au squat déclin à 3 ou moins, trois jours de suite", d:p.vals.map(v=>v==null?"—":v).join(" · ")});
+  it.push({ok:ad>=85, t:"Au moins 85 % des blocs faits sur les 7 derniers jours", d:ad+" %"});
+  it.push({ok:sp===0, t:"Aucune hausse de 2 points à 24 h après une charge lourde", d:sp?sp+" hausse(s)":"aucune"});
+  if(toPh==="S3"){
+    it.push({ok:!!c.run, t:"Course linéaire de 25 min sans douleur", man:"run"});
+    it.push({ok:!!c.ball, t:"Ballon à l'arrêt : aucune réaction à 24 h", man:"ball"});
+  }
+  return {items:it, ok:it.every(x=>x.ok)};
+}
+
+/* ---- Mesures Garmin (importées, jamais saisies à la main) ---- */
+function gOf(iso){ const g=DB.g||{}; for(let i=0;i<=1;i++){ const k=shiftISO(iso,-i); if(g[k]) return {k:k, g:g[k]}; } return null; }
+function rhrBase(){
+  const g=DB.g||{}, v=Object.keys(g).sort().slice(-8).map(k=>g[k].rhr).filter(x=>x!=null).sort((a,b)=>a-b);
+  return v.length ? v[Math.floor(v.length/2)] : null;
+}
+function readiness(iso){
+  const r=gOf(iso); if(!r) return null;
+  const g=r.g, flags=[], rb=rhrBase();
+  if(g.sl!=null && g.sl<5) flags.push("sommeil de "+String(g.sl).replace(".",",")+" h");
+  if(g.hv!=null && g.lo!=null && g.hv<g.lo) flags.push("VFC "+g.hv+", sous ta plage "+g.lo+"–"+g.hi);
+  if(g.rhr!=null && rb!=null && g.rhr>=rb+5) flags.push("FC de repos "+g.rhr+" (+"+(g.rhr-rb)+")");
+  return {k:r.k, g:g, flags:flags};
 }
 
 /* ============================================================
@@ -1364,8 +1523,8 @@ const el=(t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!=
 const CHK = '<svg viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6"/></svg>';
 
 function renderToday(){
-  const d = day(T), ids = planFor(T), ph = PROG[DB.set.phase];
-  $("#hday").textContent = DOWS[isoDow(T)]+" · J"+protoDayNum(T)+" · "+DB.set.phase;
+  const d = day(T), ids = planFor(T), ph = PROG[phaseOf(T)];
+  $("#hday").textContent = DOWS[isoDow(T)]+" · J"+protoDayNum(T)+" · "+phaseOf(T);
   $("#todayTitle").textContent = ph.label;
   $("#todayLede").textContent = ph.goal;
 
@@ -1424,20 +1583,20 @@ function renderToday(){
     stat(d.kpi.pain!=null?d.kpi.pain:"—","Douleur")+
     stat(streak()+" j","Série");
 
-  /* La semaine active doit correspondre au jour de protocole : J1-J7 en S1, J8-J14 en S2,
-     J15 et plus en S3. Au-delà, c'est presque toujours un clic involontaire. */
+  /* La phase active ne doit pas devancer la date au plus tôt du calendrier (EARLY).
+     Au-delà, c'est presque toujours un clic involontaire. */
   const pw = $("#phaseWarn");
-  const jour = protoDayNum(T);
-  const attendu = jour<=7 ? "S1" : (jour<=14 ? "S2" : "S3");
-  const iA = PHORDER.indexOf(DB.set.phase), iE = PHORDER.indexOf(attendu);
+  const jour = protoDayNum(T), act = phaseOf(T);
+  let attendu = "S1"; PHORDER.forEach(k=>{ if(!EARLY[k] || EARLY[k]<=T) attendu=k; });
+  const iA = PHORDER.indexOf(act), iE = PHORDER.indexOf(attendu);
   if(iA>iE){
     pw.hidden=false;
-    pw.innerHTML = "<strong>"+PROG[DB.set.phase].label+" est active alors que tu es au jour "+jour+" du protocole.</strong> "
-      + "À ce stade, la "+PROG[attendu].label.toLowerCase()+" est la bonne. "
-      + (DB.set.phase==="S3" ? "La semaine 3 contient pliométrie, sprints et frappes — sur un tendon encore réactif, c'est le moyen le plus rapide de repartir à zéro. " : "")
+    pw.innerHTML = "<strong>"+PROG[act].label+" est active alors que tu es au jour "+jour+" du protocole.</strong> "
+      + "À ce stade, la "+PROG[attendu].label.toLowerCase()+" est la bonne : le calendrier n'autorise "+act+" qu'à partir du "+fr(EARLY[act])+". "
+      + (act==="S3" ? "La semaine 3 contient pliométrie, sprints et frappes — sur un tendon encore réactif, c'est le moyen le plus rapide de repartir à zéro. " : "")
       + "<button class=\"btn\" id=\"phaseFix\" style=\"margin-top:9px\">Revenir en "+PROG[attendu].label+"</button>";
     const fx=$("#phaseFix");
-    if(fx) fx.onclick=()=>{ DB.set.phase=attendu; browsePh=attendu; save(); renderToday(); renderWeek(); renderProto(); };
+    if(fx) fx.onclick=()=>{ setPhase(attendu); browsePh=attendu; renderToday(); renderWeek(); renderProto(); };
   } else { pw.hidden=true; }
 
   const fn = $("#fastNote");
@@ -1446,7 +1605,36 @@ function renderToday(){
     fn.innerHTML = "<strong>Jour de jeûne.</strong> Isométrie et chaîne de soutien maintenues — coût métabolique quasi nul. Charge lourde supprimée le matin, reportée à 20 h 30 si tu te sens bien. Rupture en trois temps : eau, dattes et isolate, puis repas complet à +45 min, puis fractionnement de l'eau jusqu'au coucher.";
   } else { fn.hidden=true; }
 
+  renderCalCard();
   renderVerdict();
+}
+
+/* Carte du jour : où tu en es dans le calendrier, mesures à faire, récupération Garmin. */
+function renderCalCard(){
+  const box=$("#calCard"); if(!box) return;
+  const ph=phaseOf(T), si=stepInfo(T), tests=testsFor(T);
+  let h='<div class="note"><strong>J'+protoDayNum(T)+' · '+ph+' · '+si.t+'</strong><br>'+si.f;
+  if(tests.length){
+    const w=DB.weeks[weekKey(T)]||{};
+    const todo=tests.filter((x,i)=>!(i===0&&w.visa!=null)&&!(i===1&&w.reps!=null));
+    h+='<br><strong>Mesures du jour :</strong> '+(todo.length?todo.join(' · '):'toutes faites, bravo')
+      +(w.visa!=null?'<br>VISA-P de la semaine : '+w.visa+'/100':'');
+  }
+  h+='</div>';
+  const r=readiness(T);
+  if(r){
+    const g=r.g, fm=v=>String(v).replace(".",",");
+    const bits=[];
+    if(g.sl!=null) bits.push("sommeil "+fm(g.sl)+" h"+(g.sc!=null?" ("+g.sc+"/100)":""));
+    if(g.hv!=null) bits.push("VFC "+g.hv+(g.lo!=null?" (plage "+g.lo+"–"+g.hi+")":""));
+    if(g.rhr!=null) bits.push("FC repos "+g.rhr);
+    if(g.bb!=null) bits.push("batterie "+g.bb);
+    const bad=r.flags.length>0;
+    h+='<div class="note '+(bad?'bad':'ok')+'"><strong>Garmin'+(r.k!==T?' ('+fr(r.k)+')':'')+'</strong> — '+bits.join(' · ')+'<br>'
+      +(bad ? '<strong>Récupération entamée</strong> ('+r.flags.join(', ')+') : remplace le Bloc B par l\'isométrie seule aujourd\'hui.'
+            : 'Récupération correcte : la charge prévue est maintenue.')+'</div>';
+  }
+  box.innerHTML=h;
 }
 function stat(v,k){ return '<div><div class="v">'+v+'</div><div class="k">'+k+'</div></div>'; }
 
@@ -1669,7 +1857,7 @@ function renderVisa(){
   const prev=[], wk=weekKey(T);
   Object.keys(DB.weeks).sort().forEach(k=>{ if(k!==wk && DB.weeks[k].visa!=null) prev.push({k:k,v:DB.weeks[k].visa}); });
   const last=prev.length?prev[prev.length-1]:null;
-  let txt="<strong>Comment lire ton score.</strong> 100 = tendon asymptomatique. En dessous de 80, la tendinopathie est symptomatique — c'est ta cible de sortie à J21. Une variation n'est cliniquement significative qu'à partir d'environ 13 points : en dessous, c'est du bruit de mesure, ne change rien au protocole pour autant.";
+  let txt="<strong>Comment lire ton score.</strong> 100 = tendon asymptomatique. En dessous de 80, la tendinopathie est symptomatique — c'est ta cible de sortie. Une variation n'est cliniquement significative qu'à partir d'environ 13 points : en dessous, c'est du bruit de mesure, ne change rien au protocole pour autant.";
   if(r.complete && last){
     const d=r.tot-last.v;
     txt += " <strong>Par rapport à ton dernier score</strong> ("+last.v+") : "+(d>0?"+"+d:d)+" point(s) — "
@@ -1730,12 +1918,98 @@ function renderWeek(){
 /* ============================================================
    8. RENDU — Protocole
    ============================================================ */
-const PHORDER = ["S1","S2","S3"];
 let browsePh = null;   /* semaine CONSULTÉE — distincte de la semaine ACTIVE */
 
+/* ---------- Calendrier jour par jour (onglet Protocole) ---------- */
+function blockNames(ids){ return ids.map(i=>BLOCKS[i]?BLOCKS[i].n.replace(/^Bloc [ABC] — /,""):i).join(" · "); }
+function renderCal(){
+  const box=$("#calSec"); if(!box) return;
+  box.innerHTML="";
+  const sec=el("div","sec",'<h2>Calendrier jusqu\'à 80 au VISA-P</h2><p class="lede">Chaque dimanche : VISA-P et répétitions. Le calendrier avance sur critères — une date est une prévision, pas un droit de passage. Coucher à 22 h 00 : le collagène de 5 h 00 laisse alors 7 h de sommeil.</p>');
+  box.appendChild(sec);
+
+  /* Trajectoire VISA-P : plancher attendu contre mesure réelle */
+  const sundays=["2026-10-11"].concat(Object.keys(VISA_FLOOR));
+  let tb='<table class="grid"><tr><th>Dimanche</th><th>Plancher</th><th>Mesuré</th><th>Phase</th></tr>';
+  sundays.forEach(iso=>{
+    const w=DB.weeks[weekKey(iso)], real=w&&w.visa!=null?w.visa:null, fl=VISA_FLOOR[iso];
+    let cell="—";
+    if(real!=null) cell='<b style="color:var(--'+(fl==null||real>=fl?"ok":"warn")+')">'+real+'</b>';
+    tb+='<tr><td>'+fr(iso)+(iso===T?" (aujourd'hui)":"")+'</td><td>'+(fl!=null?"≥ "+fl:"départ")+'</td><td>'+cell+'</td><td>'+phaseOf(iso)+(iso>T?" (prévu)":"")+'</td></tr>';
+  });
+  tb+='</table>';
+  const tw=el("div",null,tb); tw.style.padding="0 14px"; box.appendChild(tw);
+  box.appendChild(el("div","note","<strong>Planchers = estimation, pas promesse.</strong> Passer de la mesure de départ à 80 en six semaines est ambitieux. Un score sous le plancher deux dimanches de suite ne se rattrape pas en forçant : il veut dire « reste dans la phase ». 80 sur deux dimanches consécutifs valide l'objectif."));
+
+  /* Critères de passage vers la phase suivante */
+  const act=phaseOf(T), nx=PHORDER[PHORDER.indexOf(act)+1];
+  if(nx){
+    const g=gateFor(nx), st=projStarts();
+    box.appendChild(el("div","sec",'<h2>Passage en '+nx+'</h2><p class="lede">Prévu le '+fr(st[nx])+', possible dès le '+fr(EARLY[nx])+' si les critères sont verts. Calculé sur tes données réelles.</p>'));
+    const gw=el("div","gate");
+    g.items.forEach(x=>{
+      const r=el("div","gi "+(x.ok?"ok":"no"),'<b>'+(x.ok?"✓":"✗")+'</b><span>'+x.t+'</span>'+(x.d?'<i>'+x.d+'</i>':""));
+      if(x.man){
+        const bt=el("button","go",x.ok?"Retirer":"Confirmer");
+        bt.style.cssText="background:none;border:1px solid var(--line2);border-radius:5px;color:var(--txt2);padding:2px 8px;font-size:12px;cursor:pointer";
+        bt.onclick=()=>{ DB.set.chk=DB.set.chk||{}; if(DB.set.chk[x.man]) delete DB.set.chk[x.man]; else DB.set.chk[x.man]=T; save(); renderCal(); };
+        r.appendChild(bt);
+      }
+      gw.appendChild(r);
+    });
+    box.appendChild(gw);
+    const row=el("div","btnrow");
+    const go=el("button","btn"+(g.ok&&T>=EARLY[nx]?"":" ghost"),"Passer en "+nx+" aujourd'hui");
+    go.disabled=!(g.ok&&T>=EARLY[nx]);
+    if(go.disabled) go.style.opacity=".45";
+    go.onclick=()=>{ setPhase(nx); browsePh=nx; renderToday(); renderWeek(); renderProto(); };
+    row.appendChild(go);
+    box.appendChild(row);
+    if(!g.ok||T<EARLY[nx]) box.appendChild(el("div","note",T<EARLY[nx]?"Trop tôt : "+nx+" n'est pas autorisée avant le "+fr(EARLY[nx])+" (même si les critères sont verts).":"Un critère est rouge : reste dans la phase actuelle. Un jour de plus ici coûte moins qu'une poussée à 24 h."));
+  }
+
+  /* Liste jour par jour, par semaine du lundi au dimanche */
+  box.appendChild(el("div","sec",'<h2>Jour par jour</h2><p class="lede">Les jours à venir suivent la phase actuelle puis la projection ci-dessus ; ils se recalculent si tu avances ou recules.</p>'));
+  for(let w=0; w<CAL_WEEKS; w++){
+    const mon=shiftISO(CAL_FROM, w*7), sun=shiftISO(mon,6);
+    const dt=el("details","cw"); if((T>=mon && T<=sun) || (w===0 && T<mon)) dt.open=true;
+    const fl=VISA_FLOOR[sun];
+    dt.appendChild(el("summary",null,'Semaine du '+fr(mon)+' au '+fr(sun)+'<small>'+(fl?"VISA-P ≥ "+fl+" le dimanche":"")+'</small>'));
+    for(let i=0;i<7;i++){
+      const iso=shiftISO(mon,i), ids=planFor(iso), si=stepInfo(iso), ph=phaseOf(iso), tests=testsFor(iso), st=projStarts();
+      const row=el("div","calrow"+(iso===T?" today":(iso<T?" past":"")));
+      row.appendChild(el("div","dt",DOWS[isoDow(iso)]+" "+Number(iso.slice(8))+'<i>J'+protoDayNum(iso)+'</i>'));
+      let chips="";
+      if(tests.length) chips+='<span class="chip t">mesures</span>';
+      if(FASTD.includes(isoDow(iso))) chips+='<span class="chip">jeûne</span>';
+      if(iso>T && (iso===st.S2||iso===st.S3)) chips+='<span class="chip g">'+ph+' prévu</span>';
+      const tx=el("div","tx",blockNames(ids)+chips+'<em>'+ph+' · '+si.t+(tests.length?' — '+tests.join(' ; '):'')+'</em>');
+      row.appendChild(tx);
+      const d=DB.days[iso];
+      if(iso<=T && d){
+        const need=ids.filter(id=>BLOCKS[id]&&BLOCKS[id].k!=="cardio"&&id!=="forceS1f"), n=need.filter(id=>d.blocks&&d.blocks[id]).length;
+        row.appendChild(el("div","res",need.length?n+"/"+need.length:""));
+      } else row.appendChild(el("div","res",""));
+      dt.appendChild(row);
+    }
+    box.appendChild(dt);
+  }
+
+  /* Charge hors protocole vue par Garmin */
+  const ga=(DB.ga||[]).slice().sort((a,b)=>a.d<b.d?1:-1);
+  if(ga.length){
+    box.appendChild(el("div","sec",'<h2>Hors protocole (Garmin)</h2><p class="lede">Séances de sport enregistrées en dehors du programme. Pendant la S1 et la S2, elles sont interdites.</p>'));
+    let t='<table class="grid"><tr><th>Date</th><th>Séance</th><th>Charge</th></tr>';
+    ga.forEach(a=>{ const inP=a.d>=(DB.set.start||a.d); t+='<tr><td>'+fr(a.d)+'</td><td>'+a.t+(inP?' <b style="color:var(--bad)">pendant le protocole</b>':'')+'</td><td>'+a.l+'</td></tr>'; });
+    t+='</table>';
+    const gwrap=el("div",null,t); gwrap.style.padding="0 14px"; box.appendChild(gwrap);
+  }
+}
+
 function renderProto(){
-  const act = DB.set.phase;
+  const act = phaseOf(T);
   if(browsePh==null || !PROG[browsePh]) browsePh = act;
+  renderCal();
 
   const p=$("#phasePick"); p.innerHTML="";
   PHORDER.forEach(k=>{
@@ -1763,7 +2037,7 @@ function renderProto(){
         setTimeout(()=>{ b.dataset.c=""; b.textContent="Passer en "+PROG[browsePh].label; },5000);
         return;
       }
-      DB.set.phase=browsePh; save(); renderProto(); renderToday(); renderWeek();
+      setPhase(browsePh); renderProto(); renderToday(); renderWeek();
     };
     sw.appendChild(b);
     let msg;
@@ -2677,9 +2951,43 @@ function go(id){
   $("main").scrollTop=0;
 }
 
+/* Fusion sans écrasement : une valeur déjà présente n'est jamais remplacée. */
+function fillMissing(dst, src){
+  let n=0;
+  Object.keys(src).forEach(k=>{
+    if(k==="__proto__"||k==="constructor"||k==="prototype") return;
+    const s=src[k];
+    if(dst[k]===undefined||dst[k]===null){ dst[k]=JSON.parse(JSON.stringify(s)); n++; }
+    else if(s&&typeof s==="object"&&!Array.isArray(s)&&typeof dst[k]==="object"&&!Array.isArray(dst[k])) n+=fillMissing(dst[k],s);
+  });
+  return n;
+}
+function mergeImport(inc){
+  const isD=/^\d{4}-\d{2}-\d{2}$/, isW=/^w\d{4}-\d{2}-\d{2}$/;
+  const pick=(o,re)=>{ const r={}; Object.keys(o||{}).forEach(k=>{ if(re.test(k)&&o[k]&&typeof o[k]==="object") r[k]=o[k]; }); return r; };
+  let n=0;
+  n+=fillMissing(DB.days, pick(inc.days,isD));
+  n+=fillMissing(DB.weeks, pick(inc.weeks,isW));
+  DB.g=DB.g||{}; n+=fillMissing(DB.g, pick(inc.g,isD));
+  DB.ga=DB.ga||[];
+  (Array.isArray(inc.ga)?inc.ga:[]).forEach(a=>{
+    if(a&&isD.test(a.d)&&typeof a.t==="string"&&typeof a.l==="number" && !DB.ga.some(x=>x.d===a.d&&x.t===a.t)){ DB.ga.push({d:a.d,t:a.t.slice(0,60),l:a.l}); n++; }
+  });
+  return n;
+}
+
 function start(){
   load();
-  if(!DB.set.start) { DB.set.start=T; save(); }
+  if(!DB.set.start) { DB.set.start=T; }
+  /* Première ouverture avec le calendrier : copie de sécurité de tout l'historique, puis
+     ajout (sans rien retirer) du journal de phases et des champs Garmin. */
+  try{
+    if(!Array.isArray(DB.set.log) && !localStorage.getItem(KEY+":avant-calendrier")){
+      localStorage.setItem(KEY+":avant-calendrier", localStorage.getItem(KEY)||JSON.stringify(DB));
+    }
+  }catch(e){}
+  phaseLog(); DB.g=DB.g||{}; DB.ga=DB.ga||[]; DB.set.phase=phaseOf(T);
+  save();
   renderNav(); renderToday(); renderEx(); renderKpi(); renderWeek(); renderProto();
 
   $("#tmrClose").onclick=closeTimer;
@@ -2793,8 +3101,20 @@ function start(){
     catch(e){ $("#copyBtn").textContent="Copie refusée par le navigateur"; }
     setTimeout(()=>$("#copyBtn").textContent="Copier mes données",2200);
   };
+  $("#impBtn").onclick=()=>{
+    const msg=$("#impMsg");
+    let inc;
+    try{ inc=JSON.parse($("#impTxt").value); if(!inc||typeof inc!=="object") throw 0; }
+    catch(e){ msg.textContent="Ce texte n'est pas un JSON valide. Rien n'a été modifié."; return; }
+    try{ localStorage.setItem(KEY+":avant-fusion", JSON.stringify(DB)); }catch(e){}
+    const n=mergeImport(inc); save();
+    msg.textContent = n ? n+" valeur(s) ajoutée(s). Rien de ce que tu avais saisi n'a été modifié." : "Rien à ajouter : tout était déjà présent.";
+    $("#impTxt").value="";
+    renderToday(); renderKpi(); renderWeek(); renderProto();
+  };
   $("#resetBtn").onclick=()=>{
     if($("#resetBtn").dataset.c!=="1"){ $("#resetBtn").dataset.c="1"; $("#resetBtn").textContent="Confirmer l'effacement"; setTimeout(()=>{$("#resetBtn").dataset.c="";$("#resetBtn").textContent="Effacer tout";},4000); return; }
+    try{ localStorage.setItem(KEY+":avant-effacement", JSON.stringify(DB)); }catch(e){}
     DB={days:{},weeks:{},set:{phase:"S1",start:T}}; save();
     renderToday(); renderKpi(); renderWeek(); renderProto();
     $("#resetBtn").dataset.c=""; $("#resetBtn").textContent="Effacer tout";
