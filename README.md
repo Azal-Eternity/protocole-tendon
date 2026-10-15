@@ -82,6 +82,11 @@ leur cache. Une fois la nouvelle version détectée, le bouton de l'en-tête dev
   (`set.log`) : les jours passés gardent leur plan d'origine, l'historique n'est jamais réécrit.
 - **Onglet Semaine → Importer** : fusionne un JSON (mesures Garmin, historique) sans écraser aucune
   valeur déjà saisie. Une copie de sécurité est gardée avant chaque fusion.
+- **Écran du jour → Séance en plus** : note un Bloc B, un vélo ou un autre sport hors plan. Jamais compté
+  dans l'assiduité ; un sport hors protocole rend rouge le critère de passage pendant sept jours.
+- **Import par lien** : `…/protocole-tendon/#import=<données>` fusionne les données au lancement puis
+  efface le lien de la barre d'adresse (un fragment d'adresse n'est jamais envoyé au serveur). Tout ce
+  qui entre est reconstruit champ par champ, rien d'autre n'est accepté.
 - **Données de santé hors du dépôt.** Le dépôt est public : les mesures Garmin et l'historique ne sont
   jamais écrits dans le code. Le dossier `donnees-perso/` est ignoré par git ; son contenu se colle
   dans l'importateur depuis le téléphone.

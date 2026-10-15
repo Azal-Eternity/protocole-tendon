@@ -531,6 +531,13 @@ header button#instBtn{
     <div id="blocks"></div>
 
     <div class="sec">
+      <h2>Séance en plus</h2>
+      <p class="lede">Ce que tu fais en dehors du plan du jour. Noté pour le suivi, mais jamais compté dans l'assiduité : un jour de repos prévu ou un bloc manqué ne se rattrape pas.</p>
+    </div>
+    <div class="pillrow" id="extraPick" style="padding-top:0"></div>
+    <div id="extraNote"></div>
+
+    <div class="sec">
       <h2>Compléments</h2>
       <p class="lede">Coche à la prise. Le collagène doit précéder la charge de 60 min — c'est le seul dont le timing est non négociable.</p>
     </div>
@@ -1351,7 +1358,7 @@ const WKPIS = [
    2. STOCKAGE
    ============================================================ */
 const KEY = "tendon:v1";
-const APP_V = "v3";   /* à garder identique à VERSION dans sw.js */
+const APP_V = "v4";   /* à garder identique à VERSION dans sw.js */
 let DB = {days:{}, weeks:{}, set:{phase:"S1", start:todayISO()}};
 
 function todayISO(d){ const x = d||new Date(); return [x.getFullYear(), String(x.getMonth()+1).padStart(2,"0"), String(x.getDate()).padStart(2,"0")].join("-"); }
@@ -1369,7 +1376,11 @@ function save(){
   try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
   catch(e){ /* quota ou mode privé : on continue sans bloquer l'usage */ }
 }
-function day(iso){ if(!DB.days[iso]) DB.days[iso]={blocks:{},supps:{},kpi:{}}; const d=DB.days[iso]; d.blocks=d.blocks||{}; d.supps=d.supps||{}; d.kpi=d.kpi||{}; return d; }
+function day(iso){ if(!DB.days[iso]) DB.days[iso]={blocks:{},supps:{},kpi:{}}; const d=DB.days[iso]; d.blocks=d.blocks||{}; d.supps=d.supps||{}; d.kpi=d.kpi||{}; d.extra=d.extra||{}; return d; }
+/* Séances en plus du plan : notées, mais jamais comptées dans l'assiduité. */
+const EXTRA = [["force","Bloc B en plus"],["cardio","Vélo en plus"],["sport","Autre sport (hors protocole)"]];
+function extraOn(iso,k){ const d=DB.days[iso]; return !!(d&&d.extra&&d.extra[k]); }
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function week(k){ if(!DB.weeks[k]) DB.weeks[k]={}; return DB.weeks[k]; }
 
 /* ============================================================
@@ -1432,7 +1443,7 @@ function planFor(iso){
   return ids;
 }
 function protoDay(iso){ return {phase:phaseOf(iso), dow:isoDow(iso), fast:FASTD.includes(isoDow(iso))}; }
-function heavyDay(iso){ return planFor(iso).some(id=>["forceS1","forceS1f","hsr"].includes(id)); }
+function heavyDay(iso){ return planFor(iso).some(id=>["forceS1","forceS1f","hsr"].includes(id)) || extraOn(iso,"force"); }
 function protoDayNum(iso){
   const s = DB.set.start||iso;
   const a = new Date(s.split("-").map((v,i)=>i===1?v-1:+v)[0], +s.split("-")[1]-1, +s.split("-")[2]);
@@ -1495,6 +1506,9 @@ function gateFor(toPh){
   it.push({ok:p.ok, t:"Douleur au squat déclin à 3 ou moins, trois jours de suite", d:p.vals.map(v=>v==null?"—":v).join(" · ")});
   it.push({ok:ad>=85, t:"Au moins 85 % des blocs faits sur les 7 derniers jours", d:ad+" %"});
   it.push({ok:sp===0, t:"Aucune hausse de 2 points à 24 h après une charge lourde", d:sp?sp+" hausse(s)":"aucune"});
+  const t7=todayISO(); let hors=null;
+  for(let i=0;i<7;i++){ const iso=shiftISO(t7,-i); if(extraOn(iso,"sport")||(DB.ga||[]).some(a=>a.d===iso&&/tennis|foot|course|basket|rugby/i.test(a.t))){ hors=iso; break; } }
+  it.push({ok:!hors, t:"Aucun sport hors protocole sur les 7 derniers jours", d:hors?"dernier : "+fr(hors):"aucun"});
   if(toPh==="S3"){
     it.push({ok:!!c.run, t:"Course linéaire de 25 min sans douleur", man:"run"});
     it.push({ok:!!c.ball, t:"Ballon à l'arrêt : aucune réaction à 24 h", man:"ball"});
@@ -1608,8 +1622,24 @@ function renderToday(){
     fn.innerHTML = "<strong>Jour de jeûne.</strong> Isométrie et chaîne de soutien maintenues — coût métabolique quasi nul. Charge lourde supprimée le matin, reportée à 20 h 30 si tu te sens bien. Rupture en trois temps : eau, dattes et isolate, puis repas complet à +45 min, puis fractionnement de l'eau jusqu'au coucher.";
   } else { fn.hidden=true; }
 
+  renderExtra();
   renderCalCard();
   renderVerdict();
+}
+
+function renderExtra(){
+  const d=day(T), pick=$("#extraPick"), nt=$("#extraNote"); if(!pick) return;
+  pick.innerHTML="";
+  EXTRA.forEach(([k,lab])=>{
+    const b=el("button","pill"+(d.extra[k]?" on":""),lab);
+    b.onclick=()=>{ if(d.extra[k]) delete d.extra[k]; else d.extra[k]=1; save(); renderToday(); renderWeek(); renderProto(); };
+    pick.appendChild(b);
+  });
+  const msgs=[], yHeavy=heavyDay(shiftISO(T,-1));
+  if(d.extra.force && yHeavy) msgs.push('<div class="note bad"><strong>Deux jours de charge lourde de suite.</strong> Hier était déjà un jour de Bloc B. Pas de reprise lourde demain : isométrie et soutien seulement, et note ta douleur à 24 h.</div>');
+  if(d.extra.sport) msgs.push('<div class="note bad"><strong>Sport hors protocole.</strong> Interdit en S1 et en S2 : il fait repasser rouge le critère « aucun sport hors protocole » pendant sept jours.</div>');
+  if((d.extra.force||d.extra.cardio) && !d.extra.sport && !(d.extra.force&&yHeavy)) msgs.push('<div class="note">Séance en plus notée. Elle ne remplace aucun bloc prévu : coche quand même ceux de la liste ci-dessus.</div>');
+  nt.innerHTML=msgs.join("");
 }
 
 /* Carte du jour : où tu en es dans le calendrier, mesures à faire, récupération Garmin. */
@@ -1985,6 +2015,7 @@ function renderCal(){
       let chips="";
       if(tests.length) chips+='<span class="chip t">mesures</span>';
       if(FASTD.includes(isoDow(iso))) chips+='<span class="chip">jeûne</span>';
+      EXTRA.forEach(([k,lab])=>{ if(extraOn(iso,k)) chips+='<span class="chip'+(k==="sport"?"":" g")+'">+ '+esc(lab.split(" (")[0].replace(" en plus",""))+'</span>'; });
       if(iso>T && (iso===st.S2||iso===st.S3)) chips+='<span class="chip g">'+ph+' prévu</span>';
       const tx=el("div","tx",blockNames(ids)+chips+'<em>'+ph+' · '+si.t+(tests.length?' — '+tests.join(' ; '):'')+'</em>');
       row.appendChild(tx);
@@ -2003,7 +2034,7 @@ function renderCal(){
   if(ga.length){
     box.appendChild(el("div","sec",'<h2>Hors protocole (Garmin)</h2><p class="lede">Séances de sport enregistrées en dehors du programme. Pendant la S1 et la S2, elles sont interdites.</p>'));
     let t='<table class="grid"><tr><th>Date</th><th>Séance</th><th>Charge</th></tr>';
-    ga.forEach(a=>{ const inP=a.d>=(DB.set.start||a.d); t+='<tr><td>'+fr(a.d)+'</td><td>'+a.t+(inP?' <b style="color:var(--bad)">pendant le protocole</b>':'')+'</td><td>'+a.l+'</td></tr>'; });
+    ga.forEach(a=>{ const inP=a.d>=(DB.set.start||a.d); t+='<tr><td>'+fr(a.d)+'</td><td>'+esc(a.t)+(inP?' <b style="color:var(--bad)">pendant le protocole</b>':'')+'</td><td>'+a.l+'</td></tr>'; });
     t+='</table>';
     const gwrap=el("div",null,t); gwrap.style.padding="0 14px"; box.appendChild(gwrap);
   }
@@ -2965,26 +2996,80 @@ function fillMissing(dst, src){
   });
   return n;
 }
-function mergeImport(inc){
-  const isD=/^\d{4}-\d{2}-\d{2}$/, isW=/^w\d{4}-\d{2}-\d{2}$/;
-  const pick=(o,re)=>{ const r={}; Object.keys(o||{}).forEach(k=>{ if(re.test(k)&&o[k]&&typeof o[k]==="object") r[k]=o[k]; }); return r; };
+const ISD=/^\d{4}-\d{2}-\d{2}$/, ISW=/^w\d{4}-\d{2}-\d{2}$/;
+/* Tout ce qui entre est reconstruit champ par champ : formats, clés et bornes connus,
+   rien d'autre. Un import (collé ou venu d'un lien) ne peut donc injecter ni texte libre
+   dans l'interface ni clé inattendue. */
+function cleanInc(inc){
+  const num=(v,lo,hi)=>(typeof v==="number"&&isFinite(v)&&v>=lo&&v<=hi)?v:undefined;
+  const o=x=>(x&&typeof x==="object"&&!Array.isArray(x))?x:{};
+  const out={days:{},weeks:{},g:{},ga:[],start:null};
+  const sids=SUPPS.map(x=>x.id);
+  const days=o(inc.days);
+  Object.keys(days).forEach(iso=>{
+    if(!ISD.test(iso)) return;
+    const s=o(days[iso]), d={blocks:{},supps:{},kpi:{},extra:{}};
+    Object.keys(o(s.blocks)).forEach(k=>{ if(BLOCKS[k]&&s.blocks[k]) d.blocks[k]=1; });
+    Object.keys(o(s.supps)).forEach(k=>{ if(sids.includes(k)&&s.supps[k]) d.supps[k]=1; });
+    KPIS.forEach(k=>{ const v=num(o(s.kpi)[k.id],0,180); if(v!==undefined) d.kpi[k.id]=v; });
+    EXTRA.forEach(([k])=>{ if(o(s.extra)[k]) d.extra[k]=1; });
+    out.days[iso]=d;
+  });
+  const weeks=o(inc.weeks);
+  Object.keys(weeks).forEach(wk=>{
+    if(!ISW.test(wk)) return;
+    const s=o(weeks[wk]), w={};
+    ["visa","reps","sym"].forEach(k=>{ const v=num(s[k],0,200); if(v!==undefined) w[k]=v; });
+    if(s.visaA&&typeof s.visaA==="object"){
+      const a={}, sa=o(s.visaA);
+      ["q1","q2","q3","q4","q5","q6","q7","q8"].forEach(k=>{ const v=num(sa[k],0,30); if(v!==undefined) a[k]=v; });
+      if(sa.q8b==="a"||sa.q8b==="b") a.q8b=sa.q8b;
+      w.visaA=a;
+    }
+    out.weeks[wk]=w;
+  });
+  const g=o(inc.g);
+  Object.keys(g).forEach(iso=>{
+    if(!ISD.test(iso)) return;
+    const s=o(g[iso]), r={};
+    ["sl","sc","hv","lo","hi","rhr","bb","st"].forEach(k=>{ const v=num(s[k],0,1000); if(v!==undefined) r[k]=v; });
+    out.g[iso]=r;
+  });
+  (Array.isArray(inc.ga)?inc.ga:[]).forEach(a=>{
+    a=o(a); const l=num(a.l,0,2000);
+    if(ISD.test(a.d) && typeof a.t==="string" && l!==undefined) out.ga.push({d:a.d, t:a.t.replace(/[^\p{L}\p{N} .'\-]/gu,"").slice(0,40), l:l});
+  });
+  const s0=o(inc.set).start; if(typeof s0==="string" && ISD.test(s0)) out.start=s0;
+  return out;
+}
+function mergeImport(raw){
+  const inc=cleanInc(raw||{});
   let n=0;
   /* Date de début : seulement pour la ramener plus tôt (restauration sur un stockage vide).
      Jamais repoussée, jamais remplacée par une date plus récente. */
-  const s0=inc.set&&inc.set.start;
-  if(typeof s0==="string" && isD.test(s0) && s0<(DB.set.start||s0)){
-    const old=DB.set.start; DB.set.start=s0;
-    phaseLog().forEach(e=>{ if(e.from===old) e.from=s0; });
+  if(inc.start && inc.start<(DB.set.start||inc.start)){
+    const old=DB.set.start; DB.set.start=inc.start;
+    phaseLog().forEach(e=>{ if(e.from===old) e.from=inc.start; });
     n++;
   }
-  n+=fillMissing(DB.days, pick(inc.days,isD));
-  n+=fillMissing(DB.weeks, pick(inc.weeks,isW));
-  DB.g=DB.g||{}; n+=fillMissing(DB.g, pick(inc.g,isD));
+  n+=fillMissing(DB.days, inc.days);
+  n+=fillMissing(DB.weeks, inc.weeks);
+  DB.g=DB.g||{}; n+=fillMissing(DB.g, inc.g);
   DB.ga=DB.ga||[];
-  (Array.isArray(inc.ga)?inc.ga:[]).forEach(a=>{
-    if(a&&isD.test(a.d)&&typeof a.t==="string"&&typeof a.l==="number" && !DB.ga.some(x=>x.d===a.d&&x.t===a.t)){ DB.ga.push({d:a.d,t:a.t.slice(0,60),l:a.l}); n++; }
-  });
+  inc.ga.forEach(a=>{ if(!DB.ga.some(x=>x.d===a.d&&x.t===a.t)){ DB.ga.push(a); n++; } });
   return n;
+}
+/* Fusion complète : copie de sécurité, ajout des valeurs absentes, rafraîchissement des écrans. */
+function runImport(inc){
+  try{ localStorage.setItem(KEY+":avant-fusion", JSON.stringify(DB)); }catch(e){}
+  const n=mergeImport(inc); save();
+  renderToday(); renderKpi(); renderWeek(); renderProto();
+  return n;
+}
+function decodeHash(h){
+  const b=h.replace(/-/g,"+").replace(/_/g,"/");
+  const bin=atob(b+"=".repeat((4-b.length%4)%4));
+  return JSON.parse(decodeURIComponent(escape(bin)));
 }
 
 function start(){
@@ -3129,12 +3214,19 @@ function start(){
     let inc;
     try{ inc=JSON.parse($("#impTxt").value); if(!inc||typeof inc!=="object") throw 0; }
     catch(e){ msg.textContent="Ce texte n'est pas un JSON valide. Rien n'a été modifié."; return; }
-    try{ localStorage.setItem(KEY+":avant-fusion", JSON.stringify(DB)); }catch(e){}
-    const n=mergeImport(inc); save();
+    const n=runImport(inc);
     msg.textContent = n ? n+" valeur(s) ajoutée(s). Rien de ce que tu avais saisi n'a été modifié." : "Rien à ajouter : tout était déjà présent.";
     $("#impTxt").value="";
-    renderToday(); renderKpi(); renderWeek(); renderProto();
   };
+  /* Import en un geste : lien du type …/#import=<données>. Le fragment d'une adresse n'est jamais
+     envoyé au serveur ; il est lu ici puis effacé de la barre d'adresse. */
+  if(location.hash.indexOf("#import=")===0){
+    let txt;
+    try{ const n=runImport(decodeHash(location.hash.slice(8))); txt=n?n+" valeur(s) importée(s) depuis le lien. Rien de ce que tu avais saisi n'a été modifié.":"Lien déjà importé : rien à ajouter."; }
+    catch(e){ txt="Lien d'import illisible. Rien n'a été modifié."; }
+    try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
+    $("#impMsg").textContent=txt; $("details.imp").open=true; go("week");
+  }
   $("#resetBtn").onclick=()=>{
     if($("#resetBtn").dataset.c!=="1"){ $("#resetBtn").dataset.c="1"; $("#resetBtn").textContent="Confirmer l'effacement"; setTimeout(()=>{$("#resetBtn").dataset.c="";$("#resetBtn").textContent="Effacer tout";},4000); return; }
     try{ localStorage.setItem(KEY+":avant-effacement", JSON.stringify(DB)); }catch(e){}
