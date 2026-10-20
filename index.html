@@ -532,7 +532,7 @@ header button#instBtn{
 
     <div class="sec">
       <h2>Séance en plus</h2>
-      <p class="lede">Ce que tu fais en dehors du plan du jour. Noté pour le suivi, mais jamais compté dans l'assiduité : un jour de repos prévu ou un bloc manqué ne se rattrape pas.</p>
+      <p class="lede">Ce que tu fais en dehors du plan du jour. Noté pour le suivi, mais jamais compté dans l'assiduité : un jour de repos prévu ou un bloc manqué ne se rattrape pas. <strong>Musculation du haut du corps : autorisée tous les jours.</strong> Les jambes et les pieds, seulement via les exercices du programme.</p>
     </div>
     <div class="pillrow" id="extraPick" style="padding-top:0"></div>
     <div id="footBox"></div>
@@ -1379,7 +1379,7 @@ function save(){
 }
 function day(iso){ if(!DB.days[iso]) DB.days[iso]={blocks:{},supps:{},kpi:{}}; const d=DB.days[iso]; d.blocks=d.blocks||{}; d.supps=d.supps||{}; d.kpi=d.kpi||{}; d.extra=d.extra||{}; return d; }
 /* Séances en plus du plan : notées, mais jamais comptées dans l'assiduité. */
-const EXTRA = [["force","Bloc B en plus"],["cardio","Vélo en plus"],["sport","Autre sport (hors protocole)"]];
+const EXTRA = [["haut","Muscu haut du corps"],["force","Bloc B en plus"],["cardio","Vélo en plus"],["sport","Autre sport (hors protocole)"]];
 function extraOn(iso,k){ const d=DB.days[iso]; return !!(d&&d.extra&&d.extra[k]); }
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function week(k){ if(!DB.weeks[k]) DB.weeks[k]={}; return DB.weeks[k]; }
@@ -1700,6 +1700,7 @@ function renderExtraNote(){
     else msgs.push('<div class="note bad"><strong>Football un jour sans séance prévue.</strong> Compte comme sport hors cadre pendant sept jours.</div>');
   }
   if(d.extra.force && yHeavy) msgs.push('<div class="note bad"><strong>Deux jours de charge lourde de suite.</strong> Hier était déjà un jour de Bloc B. Pas de reprise lourde demain : isométrie et soutien seulement, et note ta douleur à 24 h.</div>');
+  if(d.extra.haut) msgs.push('<div class="note ok"><strong>Haut du corps : autorisé.</strong> Poitrine, dos, épaules, bras, abdos, sans jambes ni impact : pas de squat, fentes, presse, soulevé de terre, saut ni burpees en dehors des blocs du programme. Assis, couché ou sur machine guidée, c\'est le plus simple.</div>');
   if(d.extra.sport) msgs.push('<div class="note bad"><strong>Sport hors protocole.</strong> Interdit en S1 et en S2 : il fait repasser rouge le critère « aucun sport hors protocole » pendant sept jours.</div>');
   if((d.extra.force||d.extra.cardio) && !d.extra.sport && !(d.extra.force&&yHeavy)) msgs.push('<div class="note">Séance en plus notée. Elle ne remplace aucun bloc prévu : coche quand même ceux de la liste ci-dessus.</div>');
   nt.innerHTML=msgs.join("");
@@ -2084,6 +2085,7 @@ function renderCal(){
   ft+='</table>';
   box.appendChild(el("div","sec",'<h2>Football obligatoire</h2><p class="lede">Entraînement du mercredi et match du dimanche : tu y vas, mais le plafond monte par palier, jamais par la date. Le matin même, douleur à 4 ou plus, palpation à 3 ou plus ou hausse de 2 points : tu restes présent sans jouer.</p>'));
   const fw=el("div",null,ft); fw.style.padding="0 14px"; box.appendChild(fw);
+  box.appendChild(el("div","note ok","<strong>Musculation du haut du corps : autorisée tous les jours.</strong> Poitrine, dos, épaules, bras, abdos. Les jambes et les pieds ne se travaillent que par les exercices du programme (Blocs A, B et C) : pas de squat, fentes, presse, soulevé de terre ni sauts en plus. Note-la dans « Séance en plus » de l'écran du jour."));
 
   /* Liste jour par jour, par semaine du lundi au dimanche */
   box.appendChild(el("div","sec",'<h2>Jour par jour</h2><p class="lede">Les jours à venir suivent la phase actuelle puis la projection ci-dessus ; ils se recalculent si tu avances ou recules.</p>'));
