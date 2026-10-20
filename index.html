@@ -535,6 +535,7 @@ header button#instBtn{
       <p class="lede">Ce que tu fais en dehors du plan du jour. Noté pour le suivi, mais jamais compté dans l'assiduité : un jour de repos prévu ou un bloc manqué ne se rattrape pas.</p>
     </div>
     <div class="pillrow" id="extraPick" style="padding-top:0"></div>
+    <div id="footBox"></div>
     <div id="extraNote"></div>
 
     <div class="sec">
@@ -1358,7 +1359,7 @@ const WKPIS = [
    2. STOCKAGE
    ============================================================ */
 const KEY = "tendon:v1";
-const APP_V = "v4";   /* à garder identique à VERSION dans sw.js */
+const APP_V = "v5";   /* à garder identique à VERSION dans sw.js */
 let DB = {days:{}, weeks:{}, set:{phase:"S1", start:todayISO()}};
 
 function todayISO(d){ const x = d||new Date(); return [x.getFullYear(), String(x.getMonth()+1).padStart(2,"0"), String(x.getDate()).padStart(2,"0")].join("-"); }
@@ -1412,14 +1413,25 @@ function phaseLog(){
 function curEntry(){ const t=todayISO(); const l=phaseLog(); let e=l[0]; l.forEach(x=>{ if(x.from<=t) e=x; }); return e; }
 function setPhase(ph){
   const t=todayISO(), l=phaseLog(), last=l[l.length-1];
-  if(last.from===t) last.ph=ph; else if(last.ph!==ph) l.push({from:t, ph:ph});
+  if(last.from===t){
+    last.ph=ph;
+    if(l.length>1 && l[l.length-2].ph===ph) l.pop();   /* retour dans la phase d'avant le jour même : on efface l'entrée, pas de doublon */
+  } else if(last.ph!==ph) l.push({from:t, ph:ph});
   DB.set.phase=ph; save();
 }
+/* Début projeté des phases suivantes : durée minimale, puis fenêtre « sport hors cadre » refermée,
+   puis le mardi suivant (jour de charge lourde). Une phase déjà vécue se refait en 7 jours au plus. */
 function projStarts(){
   const t=todayISO(), c=curEntry(), st={}; let prev=c.from;
   for(let i=PHORDER.indexOf(c.ph)+1;i<PHORDER.length;i++){
-    let s=shiftISO(prev, PH_MIN[PHORDER[i-1]]);
+    const from=PHORDER[i-1];
+    const visited=phaseLog().some(e=>e.ph===from && e.from<prev);
+    let s=shiftISO(prev, visited?7:PH_MIN[from]);
     if(s<=t) s=shiftISO(t,1);
+    if(i===PHORDER.indexOf(c.ph)+1){
+      for(let k=0;k<7;k++){ const d=shiftISO(t,-k); if(sportBreach(d)){ const clr=shiftISO(d,7); if(clr>s) s=clr; break; } }
+    }
+    while(isoDow(s)!==2) s=shiftISO(s,1);
     st[PHORDER[i]]=s; prev=s;
   }
   return st;
@@ -1469,6 +1481,34 @@ const STEPS = {
   ]
 };
 function stepInfo(iso){ const a=STEPS[phaseOf(iso)]; return a[Math.min(stepOf(iso), a.length-1)]; }
+
+/* ---- Football obligatoire (entraînement du mercredi, match du dimanche) ----
+   Présence encadrée : plafond de minutes par phase et par palier, pas par date. Le plafond
+   monte seulement quand le palier suivant est atteint ; un 0 veut dire « présent sans jouer ». */
+const FOOT = {
+  S1:[{wed:20, sun:0, d:"ballon à l'arrêt et passes"}],
+  S2:[{wed:30, sun:0, d:"sans duel, sans frappe, sans sprint"}],
+  S3:[{wed:45, sun:0, d:"sans duel"},
+      {wed:60, sun:0, d:"intensité normale, sans sprint"},
+      {wed:60, sun:0, d:"entraînement complet, pas de match"},
+      {wed:90, sun:0, d:"entraînement complet ; match de 30-45 min seulement après 5/5 aux tests de sortie"}]
+};
+function footCap(iso){
+  const dow=isoDow(iso); if(dow!==3 && dow!==0) return null;
+  const a=FOOT[phaseOf(iso)], f=a[Math.min(stepOf(iso), a.length-1)];
+  return {min: dow===3?f.wed:f.sun, d:f.d, dow:dow};
+}
+/* Un sport hors cadre : autre sport, football au-delà du plafond ou un jour sans football prévu. */
+function sportBreach(iso){
+  const d=DB.days[iso], ex=(d&&d.extra)||{}, cap=footCap(iso), capMin=cap?cap.min:0;
+  if(ex.sport) return true;
+  if(ex.foot!=null && ex.foot>capMin) return true;
+  return (DB.ga||[]).some(a=>{
+    if(a.d!==iso) return false;
+    if(/foot/i.test(a.t)){ const m=/(\d+)\s*min/.exec(a.t); return m ? (+m[1]>capMin) : true; }
+    return /tennis|course|basket|rugby/i.test(a.t);
+  });
+}
 function testsFor(iso){
   if(isoDow(iso)!==0) return [];
   const t=["VISA-P, avant toute séance (10 h)","Répétitions avant douleur 4/10, squat déclin unipodal"];
@@ -1507,8 +1547,8 @@ function gateFor(toPh){
   it.push({ok:ad>=85, t:"Au moins 85 % des blocs faits sur les 7 derniers jours", d:ad+" %"});
   it.push({ok:sp===0, t:"Aucune hausse de 2 points à 24 h après une charge lourde", d:sp?sp+" hausse(s)":"aucune"});
   const t7=todayISO(); let hors=null;
-  for(let i=0;i<7;i++){ const iso=shiftISO(t7,-i); if(extraOn(iso,"sport")||(DB.ga||[]).some(a=>a.d===iso&&/tennis|foot|course|basket|rugby/i.test(a.t))){ hors=iso; break; } }
-  it.push({ok:!hors, t:"Aucun sport hors protocole sur les 7 derniers jours", d:hors?"dernier : "+fr(hors):"aucun"});
+  for(let i=0;i<7;i++){ const iso=shiftISO(t7,-i); if(sportBreach(iso)){ hors=iso; break; } }
+  it.push({ok:!hors, t:"Aucun sport hors cadre sur les 7 derniers jours (football dans le plafond autorisé)", d:hors?"dernier : "+fr(hors):"aucun"});
   if(toPh==="S3"){
     it.push({ok:!!c.run, t:"Course linéaire de 25 min sans douleur", man:"run"});
     it.push({ok:!!c.ball, t:"Ballon à l'arrêt : aucune réaction à 24 h", man:"ball"});
@@ -1628,14 +1668,37 @@ function renderToday(){
 }
 
 function renderExtra(){
-  const d=day(T), pick=$("#extraPick"), nt=$("#extraNote"); if(!pick) return;
+  const d=day(T), pick=$("#extraPick"), fb=$("#footBox"); if(!pick) return;
   pick.innerHTML="";
   EXTRA.forEach(([k,lab])=>{
     const b=el("button","pill"+(d.extra[k]?" on":""),lab);
     b.onclick=()=>{ if(d.extra[k]) delete d.extra[k]; else d.extra[k]=1; save(); renderToday(); renderWeek(); renderProto(); };
     pick.appendChild(b);
   });
-  const msgs=[], yHeavy=heavyDay(shiftISO(T,-1));
+  /* Football encadré : saisie des minutes jouées, sans reconstruire l'écran à chaque chiffre. */
+  fb.innerHTML="";
+  const row=el("div",null,'<span>Football encadré — minutes jouées :</span>');
+  row.style.cssText="padding:10px 14px 0;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt2);flex-wrap:wrap";
+  const inp=document.createElement("input");
+  inp.type="number"; inp.min=0; inp.max=300; inp.inputMode="numeric"; inp.setAttribute("aria-label","Minutes de football jouées");
+  inp.value=d.extra.foot!=null?d.extra.foot:"";
+  inp.style.cssText="width:74px;background:var(--bg2);border:1px solid var(--line2);border-radius:5px;padding:6px 8px;font-size:16px";
+  inp.oninput=()=>{
+    const v=inp.value===""?null:Math.max(0,Math.min(300,+inp.value));
+    if(v==null) delete d.extra.foot; else d.extra.foot=v;
+    save(); renderExtraNote(); renderCalCard(); renderProto();
+  };
+  row.appendChild(inp); fb.appendChild(row);
+  renderExtraNote();
+}
+function renderExtraNote(){
+  const d=day(T), nt=$("#extraNote"); if(!nt) return;
+  const msgs=[], yHeavy=heavyDay(shiftISO(T,-1)), cap=footCap(T);
+  if(d.extra.foot!=null){
+    if(cap && d.extra.foot<=cap.min) msgs.push('<div class="note ok"><strong>Football dans le plafond</strong> ('+d.extra.foot+' sur '+cap.min+' min). Note ta douleur à 24 h et à 48 h.</div>');
+    else if(cap) msgs.push('<div class="note bad"><strong>Football au-dessus du plafond</strong> ('+d.extra.foot+' min, plafond '+cap.min+'). Compte comme sport hors cadre : le critère de passage repasse au rouge pendant sept jours. Note ta douleur à 24 h et à 48 h.</div>');
+    else msgs.push('<div class="note bad"><strong>Football un jour sans séance prévue.</strong> Compte comme sport hors cadre pendant sept jours.</div>');
+  }
   if(d.extra.force && yHeavy) msgs.push('<div class="note bad"><strong>Deux jours de charge lourde de suite.</strong> Hier était déjà un jour de Bloc B. Pas de reprise lourde demain : isométrie et soutien seulement, et note ta douleur à 24 h.</div>');
   if(d.extra.sport) msgs.push('<div class="note bad"><strong>Sport hors protocole.</strong> Interdit en S1 et en S2 : il fait repasser rouge le critère « aucun sport hors protocole » pendant sept jours.</div>');
   if((d.extra.force||d.extra.cardio) && !d.extra.sport && !(d.extra.force&&yHeavy)) msgs.push('<div class="note">Séance en plus notée. Elle ne remplace aucun bloc prévu : coche quand même ceux de la liste ci-dessus.</div>');
@@ -1654,6 +1717,18 @@ function renderCalCard(){
       +(w.visa!=null?'<br>VISA-P de la semaine : '+w.visa+'/100':'');
   }
   h+='</div>';
+  const fc=footCap(T);
+  if(fc){
+    const dd=day(T).kpi, py=painOn(shiftISO(T,-1));
+    const known=dd.pain!=null||dd.palp!=null;
+    const stop=(dd.pain!=null&&dd.pain>=4)||(dd.palp!=null&&dd.palp>=3)||(dd.pain!=null&&py!=null&&dd.pain-py>=2);
+    h+='<div class="note '+(stop?'bad':'ok')+'"><strong>Football aujourd\'hui ('+(fc.dow===3?'entraînement':'match')+') :</strong> '
+      +(fc.min>0?'plafond '+fc.min+' min, '+fc.d:'présent sans jouer, '+fc.d)+'.<br>'
+      +(!known?'Note ta douleur et ta palpation d\'abord : elles décident.'
+        :(stop?'<strong>Ne joue pas aujourd\'hui</strong> (douleur ≥ 4, palpation ≥ 3 ou hausse de 2 points) : reste présent sans toucher le ballon.'
+               :'Critère du matin respecté : tu peux jouer dans le plafond.'))
+      +'<br>Avant : isométrie d\'amorçage 2 × 45 s. Après : note ta douleur à 24 h et 48 h.</div>';
+  }
   const r=readiness(T);
   if(r){
     const g=r.g, fm=v=>String(v).replace(".",",");
@@ -2001,6 +2076,15 @@ function renderCal(){
     if(!g.ok||T<EARLY[nx]) box.appendChild(el("div","note",T<EARLY[nx]?"Trop tôt : "+nx+" n'est pas autorisée avant le "+fr(EARLY[nx])+" (même si les critères sont verts).":"Un critère est rouge : reste dans la phase actuelle. Un jour de plus ici coûte moins qu'une poussée à 24 h."));
   }
 
+  /* Football obligatoire : plafonds par phase */
+  let ft='<table class="grid"><tr><th>Phase</th><th>Mercredi</th><th>Dimanche</th></tr>';
+  PHORDER.forEach(p=>FOOT[p].forEach((f,i)=>{
+    ft+='<tr><td>'+p+(FOOT[p].length>1?' · palier '+(i+1):'')+'</td><td>'+f.wed+' min<br><small>'+f.d+'</small></td><td>'+(f.sun>0?f.sun+' min':'présent sans jouer')+'</td></tr>';
+  }));
+  ft+='</table>';
+  box.appendChild(el("div","sec",'<h2>Football obligatoire</h2><p class="lede">Entraînement du mercredi et match du dimanche : tu y vas, mais le plafond monte par palier, jamais par la date. Le matin même, douleur à 4 ou plus, palpation à 3 ou plus ou hausse de 2 points : tu restes présent sans jouer.</p>'));
+  const fw=el("div",null,ft); fw.style.padding="0 14px"; box.appendChild(fw);
+
   /* Liste jour par jour, par semaine du lundi au dimanche */
   box.appendChild(el("div","sec",'<h2>Jour par jour</h2><p class="lede">Les jours à venir suivent la phase actuelle puis la projection ci-dessus ; ils se recalculent si tu avances ou recules.</p>'));
   for(let w=0; w<CAL_WEEKS; w++){
@@ -2015,6 +2099,8 @@ function renderCal(){
       let chips="";
       if(tests.length) chips+='<span class="chip t">mesures</span>';
       if(FASTD.includes(isoDow(iso))) chips+='<span class="chip">jeûne</span>';
+      const fcc=footCap(iso);
+      if(fcc) chips+='<span class="chip t">⚽ '+(fcc.min>0?'≤ '+fcc.min+' min':'présent')+'</span>';
       EXTRA.forEach(([k,lab])=>{ if(extraOn(iso,k)) chips+='<span class="chip'+(k==="sport"?"":" g")+'">+ '+esc(lab.split(" (")[0].replace(" en plus",""))+'</span>'; });
       if(iso>T && (iso===st.S2||iso===st.S3)) chips+='<span class="chip g">'+ph+' prévu</span>';
       const tx=el("div","tx",blockNames(ids)+chips+'<em>'+ph+' · '+si.t+(tests.length?' — '+tests.join(' ; '):'')+'</em>');
@@ -3013,6 +3099,7 @@ function cleanInc(inc){
     Object.keys(o(s.supps)).forEach(k=>{ if(sids.includes(k)&&s.supps[k]) d.supps[k]=1; });
     KPIS.forEach(k=>{ const v=num(o(s.kpi)[k.id],0,180); if(v!==undefined) d.kpi[k.id]=v; });
     EXTRA.forEach(([k])=>{ if(o(s.extra)[k]) d.extra[k]=1; });
+    const fv=num(o(s.extra).foot,0,300); if(fv!==undefined) d.extra.foot=fv;
     out.days[iso]=d;
   });
   const weeks=o(inc.weeks);

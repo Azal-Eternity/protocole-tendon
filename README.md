@@ -84,6 +84,9 @@ leur cache. Une fois la nouvelle version détectée, le bouton de l'en-tête dev
   valeur déjà saisie. Une copie de sécurité est gardée avant chaque fusion.
 - **Écran du jour → Séance en plus** : note un Bloc B, un vélo ou un autre sport hors plan. Jamais compté
   dans l'assiduité ; un sport hors protocole rend rouge le critère de passage pendant sept jours.
+- **Football encadré** (entraînement du mercredi, match du dimanche) : plafond de minutes par phase et par
+  palier, règle du matin (douleur ≥ 4, palpation ≥ 3 ou hausse de 2 points : présent sans jouer). Un
+  football dans le plafond ne fait pas passer au rouge le critère « sport hors cadre ».
 - **Import par lien** : `…/protocole-tendon/#import=<données>` fusionne les données au lancement puis
   efface le lien de la barre d'adresse (un fragment d'adresse n'est jamais envoyé au serveur). Tout ce
   qui entre est reconstruit champ par champ, rien d'autre n'est accepté.
