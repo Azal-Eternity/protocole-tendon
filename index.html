@@ -256,6 +256,13 @@ table.grid td b{font-weight:600}
   padding:8px 10px;font-size:16px;font-family:"Barlow Condensed",sans-serif;font-weight:600;
 }
 .numin span{font-size:13px;color:var(--txt2)}
+.kday{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--surf);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.kday .lab{flex:1 1 140px;font-family:"Barlow Condensed",sans-serif;font-size:18px;font-weight:600;text-align:center}
+.kday .lab small{display:block;font-family:inherit;font-size:11.5px;font-weight:500;color:var(--txt3)}
+.kday button,.kday input{background:var(--bg2);border:1px solid var(--line2);color:var(--txt);border-radius:var(--r);padding:8px 12px;font-size:15px}
+.kday button:disabled{opacity:.35}
+.kday button.back{flex:1 1 100%;color:var(--gold);border-color:var(--gold)}
+.kfoot{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:13px;color:var(--txt2);flex-wrap:wrap;background:var(--surf)}
 
 .spark{display:flex;align-items:flex-end;gap:3px;height:52px;padding:14px 14px 0}
 .spark div{flex:1 1 0;background:var(--line2);border-radius:2px 2px 0 0;min-height:2px;position:relative}
@@ -566,7 +573,9 @@ header button#instBtn{
       <h2>Mesures du matin</h2>
       <p class="lede">À 6 h 00, avant la séance, toujours dans le même ordre. Ces trois chiffres pilotent tout le protocole.</p>
     </div>
+    <div class="kday" id="kpiDay"></div>
     <div id="kpiFields"></div>
+    <div id="kpiCatch"></div>
 
     <div class="sec">
       <h2>Douleur au squat déclin — 14 derniers jours</h2>
@@ -577,7 +586,7 @@ header button#instBtn{
 
     <div class="sec" style="margin-top:6px">
       <h2>Bilan hebdomadaire</h2>
-      <p class="lede">Le dimanche à 10 h. Le VISA-P est le questionnaire de référence sur cette pathologie — sans lui tu pilotes à l'aveugle.</p>
+      <p class="lede" id="weeklyLede">Le dimanche à 10 h. Le VISA-P est le questionnaire de référence sur cette pathologie — sans lui tu pilotes à l'aveugle.</p>
     </div>
     <div id="weeklyFields"></div>
   </section>
@@ -1359,7 +1368,7 @@ const WKPIS = [
    2. STOCKAGE
    ============================================================ */
 const KEY = "tendon:v1";
-const APP_V = "v5";   /* à garder identique à VERSION dans sw.js */
+const APP_V = "v6";   /* à garder identique à VERSION dans sw.js */
 let DB = {days:{}, weeks:{}, set:{phase:"S1", start:todayISO()}};
 
 function todayISO(d){ const x = d||new Date(); return [x.getFullYear(), String(x.getMonth()+1).padStart(2,"0"), String(x.getDate()).padStart(2,"0")].join("-"); }
@@ -1575,6 +1584,7 @@ function readiness(iso){
    4. RENDU — écran Aujourd'hui
    ============================================================ */
 const T = todayISO();
+let E = T;   /* jour de saisie de l'onglet KPI : aujourd'hui par défaut, un jour passé pour rattraper un oubli */
 const $ = s=>document.querySelector(s);
 const el=(t,c,h)=>{const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;};
 const CHK = '<svg viewBox="0 0 24 24"><path d="M4 12.5 9.5 18 20 6"/></svg>';
@@ -1826,8 +1836,49 @@ function renderEx(){
    6. RENDU — KPI
    ============================================================ */
 function zone(v){ return v<=2?"ok":(v<=4?"warn":"bad"); }
+/* Sélecteur de jour de l'onglet KPI : rattrape une mesure ou un bilan oublié. Jamais au-delà d'aujourd'hui. */
+function kpiMin(){ const s=DB.set.start; return s && s<CAL_FROM ? s : CAL_FROM; }
+function kpiGo(iso){ if(iso>T) iso=T; if(iso<kpiMin()) iso=kpiMin(); E=iso; renderKpi(); }
+function renderKpiDay(){
+  const bar=$("#kpiDay"); bar.innerHTML="";
+  const prev=el("button",null,"‹"); prev.setAttribute("aria-label","Jour précédent"); prev.disabled=E<=kpiMin(); prev.onclick=()=>kpiGo(shiftISO(E,-1));
+  const next=el("button",null,"›"); next.setAttribute("aria-label","Jour suivant"); next.disabled=E>=T; next.onclick=()=>kpiGo(shiftISO(E,1));
+  const lab=el("div","lab",DOWN[isoDow(E)][0].toUpperCase()+DOWN[isoDow(E)].slice(1)+" "+fr(E)+"<small>"+(E===T?"Aujourd'hui":(daysBetween(E,T)===1?"Hier":"Il y a "+daysBetween(E,T)+" jours"))+" · semaine du "+fr(weekKey(E).slice(1))+"</small>");
+  const pick=document.createElement("input"); pick.type="date"; pick.value=E; pick.max=T; pick.min=kpiMin(); pick.setAttribute("aria-label","Choisir un jour");
+  pick.onchange=()=>{ if(pick.value) kpiGo(pick.value); };
+  bar.appendChild(prev); bar.appendChild(lab); bar.appendChild(next); bar.appendChild(pick);
+  if(E!==T){ const b=el("button","back","Revenir à aujourd'hui"); b.onclick=()=>kpiGo(T); bar.appendChild(b); }
+}
+/* Séances, compléments et football d'un jour passé : même données que l'écran du jour, saisies après coup. */
+function renderKpiCatch(){
+  const box=$("#kpiCatch"); box.innerHTML=""; if(E===T) return;
+  const d=day(E), ids=E<(DB.set.start||E)?[]:planFor(E), hv=heavyDay(E);
+  box.appendChild(el("div","sec",'<h2>Séance du '+fr(E)+'</h2><p class="lede">Ce qui a été fait ce jour-là. Coche après coup : l\'assiduité et les critères de passage se recalculent.</p>'));
+  const redraw=()=>{ save(); renderKpiCatch(); renderToday(); renderWeek(); renderProto(); };
+  const row=(name,sub,done,toggle)=>{
+    const r=el("div","row"+(done?" done":"")); r.appendChild(el("span","bar"));
+    const c=el("button","chk",CHK); c.setAttribute("aria-pressed",done?"true":"false"); c.setAttribute("aria-label",(done?"Décocher":"Cocher")+" "+name); c.onclick=toggle; r.appendChild(c);
+    const b=el("div","body"); b.appendChild(el("div","name",esc(name))); if(sub) b.appendChild(el("div","sub",esc(sub))); r.appendChild(b);
+    box.appendChild(r);
+  };
+  ids.forEach(id=>{ const b=BLOCKS[id]; if(!b) return; row(b.n,b.s,!!d.blocks[id],()=>{ if(d.blocks[id]) delete d.blocks[id]; else d.blocks[id]=1; redraw(); }); });
+  SUPPS.filter(s=>!s.heavyOnly||hv).forEach(s=>row(s.n,s.s,!!d.supps[s.id],()=>{ if(d.supps[s.id]) delete d.supps[s.id]; else d.supps[s.id]=1; redraw(); }));
+  const cap=footCap(E);
+  if(cap || d.extra.foot!=null){
+    const f=el("div","kfoot",'<span>Football encadré — minutes jouées :</span>');
+    const inp=document.createElement("input"); inp.type="number"; inp.min=0; inp.max=300; inp.inputMode="numeric"; inp.setAttribute("aria-label","Minutes de football jouées");
+    inp.value=d.extra.foot!=null?d.extra.foot:""; inp.style.cssText="width:74px;background:var(--bg2);border:1px solid var(--line2);border-radius:5px;padding:6px 8px;font-size:16px;color:var(--txt)";
+    inp.oninput=()=>{ const v=inp.value===""?null:Math.max(0,Math.min(300,+inp.value)); if(v==null) delete d.extra.foot; else d.extra.foot=v; save(); renderToday(); renderWeek(); renderProto(); };
+    f.appendChild(inp); box.appendChild(f);
+  }
+  const pk=el("div","pillrow");
+  EXTRA.forEach(([k,lab])=>{ const b=el("button","pill"+(d.extra[k]?" on":""),lab); b.onclick=()=>{ if(d.extra[k]) delete d.extra[k]; else d.extra[k]=1; redraw(); }; pk.appendChild(b); });
+  box.appendChild(pk);
+}
 function renderKpi(){
-  const d=day(T), w=week(weekKey(T)), box=$("#kpiFields"); box.innerHTML="";
+  const d=day(E), w=week(weekKey(E)), box=$("#kpiFields"); box.innerHTML="";
+  renderKpiDay(); renderKpiCatch();
+  $("#weeklyLede").textContent = "Semaine du "+fr(weekKey(E).slice(1))+" au "+fr(shiftISO(weekKey(E).slice(1),6))+(E===T?"":" — saisie rétroactive")+". Le dimanche à 10 h. Le VISA-P est le questionnaire de référence sur cette pathologie — sans lui tu pilotes à l'aveugle.";
   KPIS.forEach(k=>{
     const f=el("div","field");
     f.appendChild(el("div","q",k.q));
@@ -1894,7 +1945,7 @@ function renderKpi(){
 }
 
 /* ---------- VISA-P : saisie guidée et calcul du score ---------- */
-function visaAns(){ const w=week(weekKey(T)); if(!w.visaA) w.visaA={}; return w.visaA; }
+function visaAns(){ const w=week(weekKey(E)); if(!w.visaA) w.visaA={}; return w.visaA; }
 function visaTotal(){
   const a=visaAns(); let tot=0, done=0;
   ["q1","q2","q3","q4","q5","q6"].forEach(k=>{ if(a[k]!=null){ tot+=a[k]; done++; } });
@@ -1963,7 +2014,7 @@ function renderVisa(){
     ? "Score VISA-P : "+r.tot+" sur 100. Touche Enregistrer pour le verser dans ton bilan de la semaine."
     : "Score partiel "+r.tot+" — il te reste "+(8-r.done)+" question(s). Le score n'a de sens que complet.";
 
-  const prev=[], wk=weekKey(T);
+  const prev=[], wk=weekKey(E);
   Object.keys(DB.weeks).sort().forEach(k=>{ if(k!==wk && DB.weeks[k].visa!=null) prev.push({k:k,v:DB.weeks[k].visa}); });
   const last=prev.length?prev[prev.length-1]:null;
   let txt="<strong>Comment lire ton score.</strong> 100 = tendon asymptomatique. En dessous de 80, la tendinopathie est symptomatique — c'est ta cible de sortie. Une variation n'est cliniquement significative qu'à partir d'environ 13 points : en dessous, c'est du bruit de mesure, ne change rien au protocole pour autant.";
@@ -3271,13 +3322,13 @@ function start(){
     const r=visaTotal();
     if(!r.complete){ $("#visaSave").textContent="Réponds aux "+(8-r.done)+" question(s) restante(s)";
       setTimeout(()=>$("#visaSave").textContent="Enregistrer ce score",2600); return; }
-    week(weekKey(T)).visa = r.tot; save();
+    week(weekKey(E)).visa = r.tot; save();
     renderKpi(); renderProto();
     $("#visaSave").textContent="Score "+r.tot+" enregistré";
     setTimeout(()=>{ $("#visaSave").textContent="Enregistrer ce score"; $("#visa").classList.remove("on"); },1100);
   };
   $("#visaWipe").onclick=()=>{
-    const w=week(weekKey(T)); w.visaA={}; save(); renderVisa();
+    const w=week(weekKey(E)); w.visaA={}; save(); renderVisa();
   };
 
   $("#copyBtn").onclick=async()=>{

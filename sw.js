@@ -2,7 +2,7 @@
    Rôle : rendre l'application utilisable sans réseau et la mettre à jour proprement.
    Incrémenter VERSION à chaque modification d'un fichier pour forcer le renouvellement. */
 
-const VERSION = "v5";
+const VERSION = "v6";
 const SHELL   = "tendon-shell-" + VERSION;   // fichiers de l'app, servis depuis le cache
 const RUNTIME = "tendon-runtime-" + VERSION; // ressources externes (polices), mises en cache à l'usage
 
